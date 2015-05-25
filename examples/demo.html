@@ -1,0 +1,155 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<title>Basic Serial Forms Example</title>
+<link href='http://fonts.googleapis.com/css?family=Lato:300,700' rel='stylesheet' type='text/css'>
+<style>
+body {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+label {
+  font-weight: 700;
+}
+
+select, input, textarea {
+  font-size: 16px;
+  border: 1px solid #CCC;
+  display: block;
+  margin: 10px 0;
+  font-family: 'Lato', sans-serif;
+  outline: 0;
+}
+input.error { border: 1px solid red; }
+.err-msg { color: red; }
+
+textarea,
+input[type="text"],
+input[type="email"] {
+  padding: 10px;
+  width: 300px;
+}
+</style>
+</head>
+<body>
+
+  <div id='demo'></div>
+
+  <script src="https://fb.me/react-0.13.3.min.js"></script>
+  <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+  <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+  <script src="../dist/react-serial-forms.min.js"></script>
+  <script type="text/jsx">
+  (function() {
+    var BasicForm = serialforms.BasicForm;
+    var InputField = serialforms.InputField;
+    var SelectField = serialforms.SelectField;
+    var TextareaField = serialforms.TextareaField;
+
+    var DemoForm = React.createClass({
+      render: function() {
+        var fruitChoices = [
+          { text: '- Select Fruit -', value: '' },
+          { text: 'Apple', value: 'orange' },
+          { text: 'Grapefruit', value: 'grapefruit' }
+        ];
+        var vegeChoices = [
+          { text: '- Select Vegetable -', value: '' },
+          { text: 'Beans', value: 'bean' },
+          { text: 'Avocado', value: 'avocado' }
+        ];
+        return (
+          <BasicForm ref='form'>
+            <h2>General Information</h2>
+            <p>
+              <label htmlFor='first_name'>First Name*</label>
+              <InputField
+                id='first_name'
+                placeholder='John'
+                name='First Name'
+                validation='required' />
+            </p>
+            <p>
+              <label htmlFor='last_name'>Last Name*</label>
+              <InputField
+                placeholder='Doe'
+                id='last_name'
+                name='Last Name'
+                validation='required'/>
+            </p>
+            <p>
+              <label htmlFor='fruit'>Fruits*</label>
+              <SelectField
+                options={fruitChoices}
+                id='fruit'
+                name='Fruit'
+                validation='required'/>
+            </p>
+            <p>
+              <label htmlFor='vege'>Vegetables*</label>
+              <SelectField
+                multiple={true}
+                options={vegeChoices}
+                id='vege'
+                name='vege'
+                validation='required'/>
+            </p>
+            <p>
+              <label htmlFor='about'>About</label>
+              <TextareaField
+                id='about'
+                name='about'/>
+            </p>
+            <p>
+              <label>Radio</label>
+              <InputField
+                type='radio'
+                value='radio-test-1'
+                name='radioexample'/>
+              <InputField
+                type='radio'
+                value='radio-test-2'
+                name='radioexample'/>
+              <InputField
+                type='radio'
+                value='radio-test-3'
+                name='radioexample'/>
+              <InputField
+                type='radio'
+                value='radio-test-4'
+                name='radioexample'/>
+            </p>
+            <p>
+              <label>Checkboxes</label>
+              <InputField
+                type='checkbox'
+                name='check-1'/>
+              <InputField
+                type='checkbox'
+                name='check-2'/>
+              <InputField
+                type='checkbox'
+                name='check-3'/>
+              <InputField
+                type='checkbox'
+                name='check-4'/>
+            </p>
+            <p>
+              <label>File</label>
+              <InputField
+                type='file'
+                name='uploaded-file'/>
+            </p>
+          </BasicForm>
+        );
+      }
+    });
+    React.render(<DemoForm />, document.getElementById('demo'));
+  })();
+  </script>
+</body>
+</html>
+
