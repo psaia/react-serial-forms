@@ -1,10 +1,10 @@
 # Serial Forms
 
-Forms don't have to be horrible. This is a simple but powerful library with
+Forms don't have to be horrible.
 
 Serial Forms aims to accomplish the following goals:
 
-* Must have formatters and validators like a good form library should.
+* Serialization is based on the naming convention for inputs.
 * Must be easily extendable and work with any type of custom component (date
     pickers, bootstrap components, ect.). It should be a good foundation for
     other form frameworks and abstractions.
@@ -32,3 +32,8 @@ Let's create a form.
 
 @TODO
 
+#### Serialization
+
+Let's create a form.
+
+@TODO
