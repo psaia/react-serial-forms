@@ -1,10 +1,19 @@
 # Serial Forms
 
-Forms don't have to be horrible.
+Forms don't have to be horrible. Serials Forms is a light abstraction over
+[React forms](https://facebook.github.io/react/docs/forms.html) that allows for
+customizable layouts for different types of data schemas. Serial Forms decouples
+the input itself from the data it generates by creating a serialized object
+that represents the input's value which may or may not be on the input itself.
+This separation of concerns makes it easy to work with third party components
+like [Bootstrap](http://react-bootstrap.github.io/) and [React
+Widgets](http://jquense.github.io/react-widgets/docs/#/) or your own custom
+components.
 
 Serial Forms aims to accomplish the following goals:
 
-* Serialization is based on the naming convention for inputs.
+* Serialization is based on the naming convention for inputs so created repeater
+    fieldsets and nested repeater fieldsets is a snap.
 * Must be easily extendable and work with any type of custom component (date
     pickers, bootstrap components, ect.). It should be a good foundation for
     other form frameworks and abstractions.
@@ -37,3 +46,8 @@ Let's create a form.
 Let's create a form.
 
 @TODO
+
+# Development
+
+* `npm install`
+* `npm test`

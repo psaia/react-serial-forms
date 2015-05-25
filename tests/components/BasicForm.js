@@ -77,6 +77,6 @@ describe('BasicForm', function() {
     expect(serializedObj.people.length).to.equal(2);
     expect(serializedObj.people[0].books.length).to.equal(2);
     expect(serializedObj.people[0].hobbies.length).to.equal(2);
-    // console.log(JSON.stringify(form.serialize(), null, 2));
+    console.log(JSON.stringify(form.serialize(), null, 2));
   });
 });
