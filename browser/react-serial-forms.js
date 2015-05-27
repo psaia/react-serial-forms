@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.serialforms = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.SerialForms = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * Copyright 2015, Lev Interactive, LLC.
  * All rights reserved.
@@ -17724,6 +17724,7 @@ exports.isBuffer = function (obj) {
 };
 
 },{}],9:[function(require,module,exports){
+(function (global){
 /**
  * Copyright 2015, Lev Interactive, LLC.
  * All rights reserved.
@@ -17750,7 +17751,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -17838,7 +17839,11 @@ var FormBase = (function (_React$Component) {
      * called "validate" on the raw DOM elements. Upon mounting, all fields are
      * setup to listen to this event.
      *
-     * @return {boolean} true if valid, false if invalid
+     * Lastly, we do a dirty async check to see if any of the inputs have a
+     * validation error based on their class name.
+     *
+     * @param {function} fn(valid){}
+     * @return {void} true
      */
     value: function validate(fn) {
       var node = _react2['default'].findDOMNode(this);
@@ -17965,7 +17970,10 @@ FormBase.propTypes = {
 };
 module.exports = exports['default'];
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
 },{"lodash":3,"qs":4}],10:[function(require,module,exports){
+(function (global){
 /**
  * Copyright 2015, Lev Interactive, LLC.
  * All rights reserved.
@@ -17994,7 +18002,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -18269,6 +18277,8 @@ InputBase.propTypes = {
 };
 module.exports = exports['default'];
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
 },{"./ValidationError":11,"./validators":16,"immutable":2}],11:[function(require,module,exports){
 'use strict';
 
@@ -18310,6 +18320,7 @@ exports['default'] = ValidationError;
 module.exports = exports['default'];
 
 },{}],12:[function(require,module,exports){
+(function (global){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18326,7 +18337,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -18355,7 +18366,7 @@ var InputField = (function (_InputBase) {
     key: 'onChange',
 
     /**
-     * We need special detection for checkboxes and radios.
+     * We need special detection for checkboxes.
      *
      * @param {object} event
      * @return {void}
@@ -18364,7 +18375,7 @@ var InputField = (function (_InputBase) {
       var val = undefined;
       switch (event.target.type) {
         case 'checkbox':
-          val = event.target.checked ? 'off' : 'on';
+          val = event.target.checked ? 'on' : 'off';
           break;
         default:
           return _get(Object.getPrototypeOf(InputField.prototype), 'onChange', this).call(this, event);
@@ -18406,7 +18417,10 @@ var InputField = (function (_InputBase) {
 exports['default'] = InputField;
 module.exports = exports['default'];
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
 },{"../InputBase":10}],13:[function(require,module,exports){
+(function (global){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18423,7 +18437,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -18517,7 +18531,10 @@ var SelectField = (function (_InputBase) {
 exports['default'] = SelectField;
 module.exports = exports['default'];
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
 },{"../InputBase":10}],14:[function(require,module,exports){
+(function (global){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18534,7 +18551,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -18591,7 +18608,10 @@ var TextareaField = (function (_InputBase) {
 exports['default'] = TextareaField;
 module.exports = exports['default'];
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
 },{"../InputBase":10}],15:[function(require,module,exports){
+(function (global){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18608,7 +18628,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = window.React;
+var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -18658,6 +18678,8 @@ var BasicForm = (function (_FormBase) {
 
 exports['default'] = BasicForm;
 module.exports = exports['default'];
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"../FormBase":9}],16:[function(require,module,exports){
 'use strict';
@@ -18727,4 +18749,4 @@ module.exports = exports['default'];
 });
 
 
-//# sourceMappingURL=react-serial-forms.min.js.map
+//# sourceMappingURL=react-serial-forms.js.map

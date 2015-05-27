@@ -41,13 +41,14 @@ input[type="email"] {
   <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
-  <script src="../dist/react-serial-forms.min.js"></script>
+  <script src="../browser/react-serial-forms.min.js"></script>
+
   <script type="text/jsx">
   (function() {
-    var BasicForm = serialforms.BasicForm;
-    var InputField = serialforms.InputField;
-    var SelectField = serialforms.SelectField;
-    var TextareaField = serialforms.TextareaField;
+    var BasicForm = SerialForms.BasicForm;
+    var InputField = SerialForms.InputField;
+    var SelectField = SerialForms.SelectField;
+    var TextareaField = SerialForms.TextareaField;
 
     var DemoForm = React.createClass({
       render: function() {

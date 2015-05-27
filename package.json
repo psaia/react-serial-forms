@@ -2,9 +2,18 @@
   "name": "react-serial-forms",
   "version": "1.0.0",
   "description": "A high performance form library built specifically for React using persistent immutable data.",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --require chai --growl --compilers js:babel/register tests/setup.js tests/*"
+    "test": "./node_modules/.bin/mocha --require chai --growl --compilers js:babel/register tests/setup.js tests/*",
+    "prepublish": "gulp"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "react": "global:React"
   },
   "repository": {
     "type": "git",
@@ -21,32 +30,30 @@
     "url": "https://github.com/LevInteractive/react-serial-forms/issues"
   },
   "homepage": "https://github.com/LevInteractive/react-serial-forms",
-  "jest": {
-    "scriptPreprocessor": "./node_modules/babel-jest",
-    "unmockedModulePathPatterns": [
-      "./node_modules/react"
-    ],
-    "testFileExtensions": [
-      "js"
-    ],
-    "moduleFileExtensions": [
-      "js"
-    ]
+  "dependencies": {
+    "lodash": "^3.9.2",
+    "qs": "^3.0.0",
+    "immutable": "^3.7.3"
+  },
+  "peerDependencies": {
+    "react": ">=0.13.0"
   },
   "devDependencies": {
     "babel": "^5.4.7",
     "babelify": "^6.1.1",
     "browserify": "^10.2.1",
+    "browserify-shim": "^3.8.7",
     "chai": "^2.3.0",
+    "del": "^1.2.0",
     "gulp": "^3.8.11",
+    "gulp-babel": "^5.1.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-react": "^3.0.1",
+    "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
-    "immutable": "^3.7.3",
     "jsdom": "^2.0.0",
-    "literalify": "^0.4.0",
-    "lodash": "^3.9.2",
-    "qs": "^3.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

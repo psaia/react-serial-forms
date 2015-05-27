@@ -12,7 +12,7 @@ components.
 
 Serial Forms aims to accomplish the following goals:
 
-* [Serialization is based on the naming convention for inputs so created repeater
+* [Serialization is based on the name attribute for inputs so creating repeater
     fieldsets and nested repeater fieldsets is a
     snap.](https://github.com/LevInteractive/react-serial-forms/blob/master/tests/components/test-forms/complex.js)
 * Must be easily extendable and work with any type of custom component (date
