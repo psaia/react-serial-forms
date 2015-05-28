@@ -33,14 +33,38 @@ and an undo button.
 
 `npm install react-serial-forms`
 
+### CommonJS
+
+`var SerialForms = require('react-serial-forms');`
+
+### ES6
+
+`import SerialForms from 'react-serial-forms';`
+
+or better, just get what you need:
+
+```javascript
+import {
+  BasicForm,
+  InputField,
+  SelectField,
+  TextareaField
+} from 'react-serial-forms'
+```
+
+### Browser
+
+Include one of the files (minified or non-minfied) in the dist/ directory of the
+npm installed module.
+
 # Usage
 
-There are 3 main essential fundamental parts to Serial Forms:
+There are 2 main essential fundamental parts to Serial Forms:
 
 1. Validation - On field change check value for validity.
 2. Serialization - Serial Forms allows you to be expressive with creating forms
-by allowing you to specify how the data is formatted by the naming conventions
-of the `name` attribute.
+by giving you the ability to specify how the data is formatted by the naming
+conventions of the `name` attribute.
 
 Without extending Serial Forms, the fields are very basic.
 
@@ -67,7 +91,40 @@ processing. Thus, saving you tons of time.
 * `name="fruits[0][name]"` = `{ "fruits": [{"name": "<value>"}] }`
 * And so on. You can nest arrays and objects infinitely.
 
-A form like this:
+**Files**
+
+`<InputField type='file' />`
+
+Conveniently, the value for a file will be the actual `files` object. This will
+only be the case for newly added files of course. Otherwise, it will be whatever
+the value attribute is set to. Likely, the name of the file on the record.
+
+**Empty values**
+
+Empty values will always be `null`.
+
+**Select Field**
+
+Options should be specified with a collection of objects:
+
+```javascript
+const choices = [
+  { text: '- Select Something -', value: null },
+  { text: 'Option 1', value: 'option_1' },
+  { text: 'Option 2', value: 'option_2' }
+];
+
+<SelectField options={choices} />
+```
+
+If the select field has `multiple={true}`, then the value will be an array.
+
+**Providing defaults**
+
+Simply pass the pre-populated value a `value` attribute.
+
+
+**Let's make a form.**
 
 ```javascript
 import {
