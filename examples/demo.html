@@ -25,6 +25,7 @@ select, input, textarea {
 }
 input.error { border: 1px solid red; }
 .err-msg { color: red; }
+.inline input { display: inline; margin: 0 10px; }
 
 textarea,
 input[type="text"],
@@ -47,7 +48,7 @@ input[type="email"] {
   <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
-  <script src="../browser/react-serial-forms.min.js"></script>
+  <script src="../browser/react-serial-forms.js"></script>
 
   <script type="text/jsx">
   (function() {
@@ -76,9 +77,12 @@ input[type="email"] {
         event.preventDefault();
       },
       updateSerialization: function() {
-        this.setState({
-          serialization: this.refs.myForm.serialize()
-        });
+        var self = this;
+        setTimeout(function() {
+          self.setState({
+            serialization: self.refs.myForm.serialize()
+          });
+        }, 0);
       },
       undo: function() {
         this.setState(function(prev) {
@@ -99,7 +103,7 @@ input[type="email"] {
           <div key={personIndex} className='person'>
             <p>
               <InputField
-                onKeyUp={this.updateSerialization}
+                onChange={this.updateSerialization}
                 name={personKey + '[full_name]'}
                 placeholder='Full Name'
                 validation='required' />
@@ -124,7 +128,7 @@ input[type="email"] {
       render: function() {
         var fruitChoices = [
           { text: '- Select Fruit -', value: '' },
-          { text: 'Apple', value: 'orange' },
+          { text: 'Apple', value: 'apple' },
           { text: 'Grapefruit', value: 'grapefruit' }
         ];
         var vegeChoices = [
@@ -133,8 +137,7 @@ input[type="email"] {
           { text: 'Avocado', value: 'avocado' }
         ];
         var attrs = {
-          onKeyUp: this.updateSerialization,
-          onClick: this.updateSerialization
+          onChange: this.updateSerialization
         };
         var serialization = JSON.stringify(this.state.serialization, null, 2);
         return (
@@ -193,47 +196,59 @@ input[type="email"] {
                   id='about'
                   name='about'/>
               </p>
-              <p>
-                <label>Radio</label>
+              <div>
+                <label>Radios</label>
+              </div>
+              <p className='inline'>
                 <InputField
                   {...attrs}
                   type='radio'
                   value='radio-test-1'
                   name='radioexample'/>
+                  <label>Radio 1</label>
                 <InputField
                   {...attrs}
                   type='radio'
                   value='radio-test-2'
                   name='radioexample'/>
+                  <label>Radio 2</label>
                 <InputField
                   {...attrs}
                   type='radio'
                   value='radio-test-3'
                   name='radioexample'/>
+                  <label>Radio 3</label>
                 <InputField
                   {...attrs}
                   type='radio'
                   value='radio-test-4'
                   name='radioexample'/>
+                  <label>Radio 4</label>
               </p>
-              <p>
+              <div>
                 <label>Checkboxes</label>
+              </div>
+              <p className='inline'>
                 <InputField
                   {...attrs}
                   type='checkbox'
                   name='check-1'/>
+                  <label>Checkbox 1</label>
                 <InputField
                   {...attrs}
                   type='checkbox'
                   name='check-2'/>
+                  <label>Checkbox 2</label>
                 <InputField
                   {...attrs}
                   type='checkbox'
                   name='check-3'/>
+                  <label>Checkbox 3</label>
                 <InputField
                   {...attrs}
                   type='checkbox'
                   name='check-4'/>
+                  <label>Checkbox 4</label>
               </p>
               <p>
                 <label>File</label>

@@ -2,9 +2,19 @@ import React from 'react';
 import InputBase from '../InputBase';
 
 export default class InputField extends InputBase {
+
+  /**
+   * @constructs InputField
+   */
   constructor(props) {
     super(props);
   }
+
+  /**
+   * Setup default attributes for component.
+   *
+   * @return {void}
+   */
   componentWillMount() {
     super.componentWillMount();
     this.updateAttrs(
@@ -14,6 +24,7 @@ export default class InputField extends InputBase {
       this.props
     );
   }
+
   /**
    * We need special detection for checkboxes.
    *
@@ -31,8 +42,15 @@ export default class InputField extends InputBase {
     }
     this.updateAttrs({
       value: val
-    });
+    }, this.ogOnChange.bind(this, event));
   }
+
+  /**
+   * Create the DOM element. Here is a good place to add classes based on the
+   * current state and apply the attrs() to the field.
+   *
+   * @return {object} ReactElement
+   */
   render() {
     let attrs = this.attrs();
     let errMessage = <span />;

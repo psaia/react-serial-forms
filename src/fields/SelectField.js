@@ -37,7 +37,7 @@ export default class SelectField extends InputBase {
     }
     this.updateAttrs({
       value: val
-    });
+    }, this.orgOnChange.bind(this, event));
   }
 
   render() {

@@ -57,9 +57,7 @@ export default class FormBase extends React.Component {
   onSubmit(event) {
     this.validate((valid) => {
       if (valid) {
-        if (window.console && window.console.info) {
-          console.info('Form data: ', this.serialize());
-        }
+        // Do things with serialization.
       }
     });
     event.preventDefault();

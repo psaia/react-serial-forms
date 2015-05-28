@@ -30,13 +30,13 @@ export default class InputBase extends React.Component {
   constructor(props) {
     super(props);
     this.validators = [];
+    this._onChange = null;
     this._hasMounted = false;
     this.state = {
       error: false,
       attrs: Map({
         className: 'serial-form-input',
         'data-serial': '{}',
-        onChange: this.onChange.bind(this),
         onBlur: () => {
           this.validate();
         },
@@ -46,12 +46,14 @@ export default class InputBase extends React.Component {
   }
 
   /**
-   * Add relevant validators.
+   * Add relevant validators and save the original onChange if one was provided.
    *
    * @return {void}
    */
   componentWillMount() {
+    this._onChange = this.props.onChange;
     this.updateAttrs(this.props);
+
     if (this.props.validation) {
       let types = this.props.validation.split(',');
       let i = 0;
@@ -155,26 +157,45 @@ export default class InputBase extends React.Component {
    * Note that validate() is not called durning the initial render which assigns
    * error to null. This essentially puts the field in a "idle" state.
    *
-   * this.updateAttrs({ value: 'foo', x: 1 }, { value: 'bar' });
+   * this.updateAttrs({ value: 'foo', x: 1 }, { value: 'bar' }, onStateUpdate);
    *  // => { value: 'bar', x: 1 }
    *
    * @param {...object} object Objects will be merged from right to left.
    * @return {void}
    */
   updateAttrs() {
+    let opts = [];
+    let updated = function() {};
+    let len = arguments.length;
+
+    for (let i = 0; i < len; i++) {
+      if (typeof arguments[i] === 'function') {
+        updated = arguments[i];
+      } else if (typeof arguments[i] === 'object') {
+        opts.push(arguments[i]);
+      }
+    }
+
+    opts.push({
+      onChange: this.onChange.bind(this)
+    });
+
     this.setState(prev => {
       let obj = {
-        attrs: prev.attrs.merge.apply(prev.attrs, arguments)
+        attrs: prev.attrs.merge.apply(prev.attrs, opts)
       };
       obj.attrs = obj.attrs.update('data-serial', v => this.serialize(obj.attrs));
       obj.error = this._hasMounted ? this.validate(obj.attrs.toJS().value) : null;
       return obj;
-    });
+    }, updated);
   }
 
   /**
    * This method must be called when the field as changed. It must get the value
    * and set a value.
+   *
+   * It's also important that this.ogOnChange gets called so if there was an
+   * actual onChange on the input, it will still get called.
    *
    * @param {object} event
    * @return {void}
@@ -183,7 +204,19 @@ export default class InputBase extends React.Component {
     const val = event.target.value;
     this.updateAttrs({
       value: val
-    });
+    }, this.ogOnChange.bind(this, event));
+  }
+
+  /**
+   * If a onChange was applied on the field it will still get called here.
+   *
+   * @param {object} event The SyntheticEvent.
+   * @return {void}
+   */
+  ogOnChange(event) {
+    if (this._onChange) {
+      this._onChange(event);
+    }
   }
 
   /**

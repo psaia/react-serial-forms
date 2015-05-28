@@ -17817,14 +17817,8 @@ var FormBase = (function (_React$Component) {
      * @return {void}
      */
     value: function onSubmit(event) {
-      var _this = this;
-
       this.validate(function (valid) {
-        if (valid) {
-          if (window.console && window.console.info) {
-            console.info('Form data: ', _this.serialize());
-          }
-        }
+        if (valid) {}
       });
       event.preventDefault();
     }
@@ -17956,6 +17950,8 @@ FormBase.propTypes = {
 };
 module.exports = exports['default'];
 
+// Do things with serialization.
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"lodash":3,"qs":4}],10:[function(require,module,exports){
@@ -18025,13 +18021,13 @@ var InputBase = (function (_React$Component) {
 
     _get(Object.getPrototypeOf(InputBase.prototype), 'constructor', this).call(this, props);
     this.validators = [];
+    this._onChange = null;
     this._hasMounted = false;
     this.state = {
       error: false,
       attrs: (0, _immutable.Map)({
         className: 'serial-form-input',
         'data-serial': '{}',
-        onChange: this.onChange.bind(this),
         onBlur: function onBlur() {
           _this.validate();
         },
@@ -18046,12 +18042,14 @@ var InputBase = (function (_React$Component) {
     key: 'componentWillMount',
 
     /**
-     * Add relevant validators.
+     * Add relevant validators and save the original onChange if one was provided.
      *
      * @return {void}
      */
     value: function componentWillMount() {
+      this._onChange = this.props.onChange;
       this.updateAttrs(this.props);
+
       if (this.props.validation) {
         var types = this.props.validation.split(',');
         var i = 0;
@@ -18167,26 +18165,41 @@ var InputBase = (function (_React$Component) {
      * Note that validate() is not called durning the initial render which assigns
      * error to null. This essentially puts the field in a "idle" state.
      *
-     * this.updateAttrs({ value: 'foo', x: 1 }, { value: 'bar' });
+     * this.updateAttrs({ value: 'foo', x: 1 }, { value: 'bar' }, onStateUpdate);
      *  // => { value: 'bar', x: 1 }
      *
      * @param {...object} object Objects will be merged from right to left.
      * @return {void}
      */
     value: function updateAttrs() {
-      var _arguments2 = arguments,
-          _this3 = this;
+      var _this3 = this;
+
+      var opts = [];
+      var updated = function updated() {};
+      var len = arguments.length;
+
+      for (var i = 0; i < len; i++) {
+        if (typeof arguments[i] === 'function') {
+          updated = arguments[i];
+        } else if (typeof arguments[i] === 'object') {
+          opts.push(arguments[i]);
+        }
+      }
+
+      opts.push({
+        onChange: this.onChange.bind(this)
+      });
 
       this.setState(function (prev) {
         var obj = {
-          attrs: prev.attrs.merge.apply(prev.attrs, _arguments2)
+          attrs: prev.attrs.merge.apply(prev.attrs, opts)
         };
         obj.attrs = obj.attrs.update('data-serial', function (v) {
           return _this3.serialize(obj.attrs);
         });
         obj.error = _this3._hasMounted ? _this3.validate(obj.attrs.toJS().value) : null;
         return obj;
-      });
+      }, updated);
     }
   }, {
     key: 'onChange',
@@ -18195,6 +18208,9 @@ var InputBase = (function (_React$Component) {
      * This method must be called when the field as changed. It must get the value
      * and set a value.
      *
+     * It's also important that this.ogOnChange gets called so if there was an
+     * actual onChange on the input, it will still get called.
+     *
      * @param {object} event
      * @return {void}
      */
@@ -18202,7 +18218,21 @@ var InputBase = (function (_React$Component) {
       var val = event.target.value;
       this.updateAttrs({
         value: val
-      });
+      }, this.ogOnChange.bind(this, event));
+    }
+  }, {
+    key: 'ogOnChange',
+
+    /**
+     * If a onChange was applied on the field it will still get called here.
+     *
+     * @param {object} event The SyntheticEvent.
+     * @return {void}
+     */
+    value: function ogOnChange(event) {
+      if (this._onChange) {
+        this._onChange(event);
+      }
     }
   }, {
     key: 'validate',
@@ -18266,6 +18296,16 @@ module.exports = exports['default'];
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"./ValidationError":11,"./validators":16,"immutable":2}],11:[function(require,module,exports){
+/**
+ * Copyright 2015, Lev Interactive, LLC.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @module ValidationError
+ */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -18332,6 +18372,11 @@ var _InputBase2 = require('../InputBase');
 var _InputBase3 = _interopRequireDefault(_InputBase2);
 
 var InputField = (function (_InputBase) {
+
+  /**
+   * @constructs InputField
+   */
+
   function InputField(props) {
     _classCallCheck(this, InputField);
 
@@ -18342,6 +18387,12 @@ var InputField = (function (_InputBase) {
 
   _createClass(InputField, [{
     key: 'componentWillMount',
+
+    /**
+     * Setup default attributes for component.
+     *
+     * @return {void}
+     */
     value: function componentWillMount() {
       _get(Object.getPrototypeOf(InputField.prototype), 'componentWillMount', this).call(this);
       this.updateAttrs({
@@ -18368,10 +18419,17 @@ var InputField = (function (_InputBase) {
       }
       this.updateAttrs({
         value: val
-      });
+      }, this.ogOnChange.bind(this, event));
     }
   }, {
     key: 'render',
+
+    /**
+     * Create the DOM element. Here is a good place to add classes based on the
+     * current state and apply the attrs() to the field.
+     *
+     * @return {object} ReactElement
+     */
     value: function render() {
       var attrs = this.attrs();
       var errMessage = _react2['default'].createElement('span', null);
@@ -18471,7 +18529,7 @@ var SelectField = (function (_InputBase) {
       }
       this.updateAttrs({
         value: val
-      });
+      }, this.orgOnChange.bind(this, event));
     }
   }, {
     key: 'render',
@@ -18578,7 +18636,6 @@ var TextareaField = (function (_InputBase) {
           this.state.error.message
         );
       }
-
       return _react2['default'].createElement(
         'span',
         { className: 'serial-input-wrapper' },
@@ -18668,6 +18725,16 @@ module.exports = exports['default'];
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"../FormBase":9}],16:[function(require,module,exports){
+/**
+ * Copyright 2015, Lev Interactive, LLC.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @module validators
+ */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

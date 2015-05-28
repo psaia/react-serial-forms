@@ -25,7 +25,6 @@ export default class TextareaField extends InputBase {
         </span>
       );
     }
-
     return (
       <span className='serial-input-wrapper'>
         <textarea {...attrs} />

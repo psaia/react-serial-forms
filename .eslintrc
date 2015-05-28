@@ -20,6 +20,7 @@
     "no-undef": 1,
     "new-cap": 0,
     "no-spaced-func": 1,
+    "no-empty": 0,
     "camelcase": 1,
     "semi": 1,
     "no-extra-semi": 1,

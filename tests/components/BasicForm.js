@@ -34,7 +34,7 @@ before(function() {
 });
 
 describe('BasicForm', function() {
-  it('should cause all inputs to validate on validate()', function() {
+  it('should cause all inputs to validate on validate()', function(done) {
     let form = setupComponent(require('./test-forms/simple.js'));
     let DOMNode = React.findDOMNode(form);
     let firstName = () => DOMNode.querySelector('input[name="first_name"]');
@@ -43,16 +43,14 @@ describe('BasicForm', function() {
     expect(isIdle(firstName().getAttribute('class'))).to.be.true;
 
     // Do a validation and make sure the fields validated correctly.
-    expect(form.validate()).to.be.false;
-    expect(isError(firstName().getAttribute('class'))).to.be.true;
-    expect(isError(company().getAttribute('class'))).to.be.false;
+    form.validate(function(valid) {
+      expect(valid).to.be.false;
 
-    // Update some fields and re-validate.
-    simulate.change(firstName(), { target: { value: 'dan' } });
-    expect(isError(firstName().getAttribute('class'))).to.be.false;
+      expect(isError(firstName().getAttribute('class'))).to.be.true;
+      expect(isError(company().getAttribute('class'))).to.be.false;
 
-    expect(form.validate()).to.be.false;
-    expect(isError(firstName().getAttribute('class'))).to.be.false;
+      done();
+    });
   });
 
   it('should correctly serialize the form data', function() {
@@ -77,6 +75,6 @@ describe('BasicForm', function() {
     expect(serializedObj.people.length).to.equal(2);
     expect(serializedObj.people[0].books.length).to.equal(2);
     expect(serializedObj.people[0].hobbies.length).to.equal(2);
-    console.log(JSON.stringify(form.serialize(), null, 2));
+    // console.log(JSON.stringify(form.serialize(), null, 2));
   });
 });
