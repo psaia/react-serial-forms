@@ -59,12 +59,14 @@ npm installed module.
 
 # Usage
 
-There are 2 main essential fundamental parts to Serial Forms:
+There are 3 fundamental aspects to Serial Forms:
 
 1. Validation - On field change check value for validity.
 2. Serialization - Serial Forms allows you to be expressive with creating forms
 by giving you the ability to specify how the data is formatted by the naming
 conventions of the `name` attribute.
+3. Freedom. You should not be restricted by using premade columns or rows. Just
+build the form the way you want with whatever frontend technology you want.
 
 Without extending Serial Forms, the fields are very basic.
 
