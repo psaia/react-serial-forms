@@ -32,12 +32,18 @@ input[type="email"] {
   padding: 10px;
   width: 300px;
 }
+
+.person { padding: 20px; background: #f1f1f1; margin: 10px 0; }
+.some-test-fields { width: 45%; float: left; }
+.serialization { position: fixed; width: 45%; right: 0; top: 20px; }
+.buttons { clear: both; }
 </style>
 </head>
 <body>
 
   <div id='demo'></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.7.3/immutable.min.js"></script>
   <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
@@ -51,6 +57,70 @@ input[type="email"] {
     var TextareaField = SerialForms.TextareaField;
 
     var DemoForm = React.createClass({
+      getInitialState: function() {
+        return {
+          serialization: '',
+          addedPeople: Immutable.List(),
+          undoCache: Immutable.List()
+        };
+      },
+      onSubmit: function(event) {
+        var self = this;
+        this.refs.myForm.validate(function(valid) {
+          if (valid) {
+            self.setState({
+              serialization: self.refs.myForm.serialize()
+            });
+          }
+        });
+        event.preventDefault();
+      },
+      updateSerialization: function() {
+        this.setState({
+          serialization: this.refs.myForm.serialize()
+        });
+      },
+      undo: function() {
+        this.setState(function(prev) {
+          return {
+            undoCache: prev.undoCache.pop(),
+            addedPeople: prev.undoCache.last()
+          }
+        });
+      },
+      addNewPerson: function() {
+        var personIndex = this.state.addedPeople.size;
+        var personKey = 'people[' + personIndex + ']';
+        var moods = [
+          { text: 'Happy' , value: 'happy' },
+          { text: 'Aloof' , value: 'aloof' }
+        ];
+        var person = (
+          <div key={personIndex} className='person'>
+            <p>
+              <InputField
+                onKeyUp={this.updateSerialization}
+                name={personKey + '[full_name]'}
+                placeholder='Full Name'
+                validation='required' />
+            </p>
+            <p>
+              <SelectField
+                onChange={this.updateSerialization}
+                options={moods}
+                value='happy'
+                name={personKey + '[mood]'}
+                validation='required' />
+            </p>
+          </div>
+        );
+        this.setState(function(prev) {
+          return {
+            undoCache: prev.undoCache.push(this.state.addedPeople),
+            addedPeople: prev.addedPeople.push(person)
+          };
+        });
+      },
       render: function() {
         var fruitChoices = [
           { text: '- Select Fruit -', value: '' },
@@ -62,88 +132,122 @@ input[type="email"] {
           { text: 'Beans', value: 'bean' },
           { text: 'Avocado', value: 'avocado' }
         ];
+        var attrs = {
+          onKeyUp: this.updateSerialization,
+          onClick: this.updateSerialization
+        };
+        var serialization = JSON.stringify(this.state.serialization, null, 2);
         return (
-          <BasicForm ref='form'>
-            <h2>General Information</h2>
-            <p>
-              <label htmlFor='first_name'>First Name*</label>
-              <InputField
-                id='first_name'
-                placeholder='John'
-                name='First Name'
-                validation='required' />
-            </p>
-            <p>
-              <label htmlFor='last_name'>Last Name*</label>
-              <InputField
-                placeholder='Doe'
-                id='last_name'
-                name='Last Name'
-                validation='required'/>
-            </p>
-            <p>
-              <label htmlFor='fruit'>Fruits*</label>
-              <SelectField
-                options={fruitChoices}
-                id='fruit'
-                name='Fruit'
-                validation='required'/>
-            </p>
-            <p>
-              <label htmlFor='vege'>Vegetables*</label>
-              <SelectField
-                multiple={true}
-                options={vegeChoices}
-                id='vege'
-                name='vege'
-                validation='required'/>
-            </p>
-            <p>
-              <label htmlFor='about'>About</label>
-              <TextareaField
-                id='about'
-                name='about'/>
-            </p>
-            <p>
-              <label>Radio</label>
-              <InputField
-                type='radio'
-                value='radio-test-1'
-                name='radioexample'/>
-              <InputField
-                type='radio'
-                value='radio-test-2'
-                name='radioexample'/>
-              <InputField
-                type='radio'
-                value='radio-test-3'
-                name='radioexample'/>
-              <InputField
-                type='radio'
-                value='radio-test-4'
-                name='radioexample'/>
-            </p>
-            <p>
-              <label>Checkboxes</label>
-              <InputField
-                type='checkbox'
-                name='check-1'/>
-              <InputField
-                type='checkbox'
-                name='check-2'/>
-              <InputField
-                type='checkbox'
-                name='check-3'/>
-              <InputField
-                type='checkbox'
-                name='check-4'/>
-            </p>
-            <p>
-              <label>File</label>
-              <InputField
-                type='file'
-                name='uploaded-file'/>
-            </p>
+          <BasicForm ref='myForm' onKeyUp={this.onChange} onSubmit={this.onSubmit}>
+            <div className='some-test-fields'>
+
+              <h2>People (Simple repeater demonstration)</h2>
+              <button onClick={this.addNewPerson} type='button'>Add a new person</button>
+              <button onClick={this.undo} type='button' disabled={!this.state.addedPeople.size}>Undo</button>
+              {this.state.addedPeople.map(function(person) {
+                return person;
+              })}
+
+              <h2>General Information (Basic fields)</h2>
+              <p>
+                <label htmlFor='first_name'>First Name*</label>
+                <InputField
+                  {...attrs}
+                  id='first_name'
+                  placeholder='John'
+                  name='First Name'
+                  validation='required' />
+              </p>
+              <p>
+                <label htmlFor='last_name'>Last Name*</label>
+                <InputField
+                  {...attrs}
+                  placeholder='Doe'
+                  id='last_name'
+                  name='Last Name'
+                  validation='required'/>
+              </p>
+              <p>
+                <label htmlFor='fruit'>Fruits*</label>
+                <SelectField
+                  {...attrs}
+                  options={fruitChoices}
+                  id='fruit'
+                  name='Fruit'
+                  validation='required'/>
+              </p>
+              <p>
+                <label htmlFor='vege'>Vegetables*</label>
+                <SelectField
+                  {...attrs}
+                  multiple={true}
+                  options={vegeChoices}
+                  id='vege'
+                  name='vege'
+                  validation='required'/>
+              </p>
+              <p>
+                <label htmlFor='about'>About</label>
+                <TextareaField
+                  {...attrs}
+                  id='about'
+                  name='about'/>
+              </p>
+              <p>
+                <label>Radio</label>
+                <InputField
+                  {...attrs}
+                  type='radio'
+                  value='radio-test-1'
+                  name='radioexample'/>
+                <InputField
+                  {...attrs}
+                  type='radio'
+                  value='radio-test-2'
+                  name='radioexample'/>
+                <InputField
+                  {...attrs}
+                  type='radio'
+                  value='radio-test-3'
+                  name='radioexample'/>
+                <InputField
+                  {...attrs}
+                  type='radio'
+                  value='radio-test-4'
+                  name='radioexample'/>
+              </p>
+              <p>
+                <label>Checkboxes</label>
+                <InputField
+                  {...attrs}
+                  type='checkbox'
+                  name='check-1'/>
+                <InputField
+                  {...attrs}
+                  type='checkbox'
+                  name='check-2'/>
+                <InputField
+                  {...attrs}
+                  type='checkbox'
+                  name='check-3'/>
+                <InputField
+                  {...attrs}
+                  type='checkbox'
+                  name='check-4'/>
+              </p>
+              <p>
+                <label>File</label>
+                <InputField
+                  {...attrs}
+                  type='file'
+                  name='uploaded-file'/>
+              </p>
+            </div>
+            <div className='serialization'>
+              <pre>
+                {serialization}
+              </pre>
+            </div>
           </BasicForm>
         );
       }
