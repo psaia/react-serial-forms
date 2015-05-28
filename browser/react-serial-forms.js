@@ -18529,7 +18529,7 @@ var SelectField = (function (_InputBase) {
       }
       this.updateAttrs({
         value: val
-      }, this.orgOnChange.bind(this, event));
+      }, this.ogOnChange.bind(this, event));
     }
   }, {
     key: 'render',
