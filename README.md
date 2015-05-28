@@ -42,19 +42,41 @@ There are 3 main essential fundamental parts to Serial Forms:
 by allowing you to specify how the data is formatted by the naming conventions
 of the `name` attribute.
 
-@TODO
+Without extending Serial Forms, the fields are very basic.
+
+* Input `<InputField />`
+* Textarea `<TextareaField />`
+* SelectField `<SelectField />`
+
+These components except all of the attributes the native (react) components
+would, with the addition of a `validation` attribute that allows you to specify
+how the field should validate.
 
 #### Validation
-
-Let's create a form.
 
 @TODO
 
 #### Serialization
 
+Serialization is based on the naming convention. This allows for the ability to
+easily create complex data structures in components without much post-submit
+processing. Thus, saving you tons of time.
+
+* `name="my-title"` = `{ "my-title": "<value>" }`
+* `name="fruits[]"` = `{ "fruits": ["<value>", "<value>", ...] }`
+* `name="fruits[0][name]"` = `{ "fruits": [{"name": "<value>"}] }`
+* And so on. You can nest arrays and objects infinitely.
+
 A form like this:
 
-```html
+```javascript
+import {
+  BasicForm,
+  InputField,
+  SelectField,
+  TextareaField
+} from 'react-serial-forms'
+
 const options = [
   { text: '- Select Something -', value: null },
   { text: 'Rollerblading', value: 'rollerblading' },
@@ -181,6 +203,40 @@ Would automatically create a serialized object like this:
   ]
 }
 ```
+
+#### Extending
+
+Extending this library is one of its main features. Please do.
+
+##### An example of creating a custom Form with react-bootstrap.
+
+```javascript
+import { React } from 'react';
+import { FormBase } from 'react-serial-forms';
+import { Grid, Row, ButtonInput, Col } from 'react-bootstrap';
+
+export default class BootstrapForm extends FormBase {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <form onSubmit={this.props.onSubmit} method={this.props.method}>
+        <Grid>
+          {this.props.children}
+          <Row>
+            <Col xs={12}>
+              <ButtonInput type='submit' bsStyle='primary' value={this.props.submitText} />
+            </Col>
+          </Row>
+        </Grid>
+      </form>
+    );
+  }
+}
+```
+
+@TODO More examples.
 
 
 # Development
