@@ -1,16 +1,11 @@
 {
   "name": "react-serial-forms",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A high performance form library built specifically for React using persistent immutable data.",
   "main": "./lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --require chai --growl --compilers js:babel/register tests/setup.js tests/*",
     "prepublish": "gulp"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
   },
   "browserify-shim": {
     "react": "global:React"

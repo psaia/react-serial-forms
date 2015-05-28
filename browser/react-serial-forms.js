@@ -17877,8 +17877,9 @@ var FormBase = (function (_React$Component) {
      */
     value: function serialize() {
       var node = _react2['default'].findDOMNode(this);
-      var NESTED_VAL = /_∆∆_(.+?)_∆∆_/g;
+      var CACHE_KEY = '___CACHE___';
       var NUMBER_LIKE = /^[0-9.]+$/;
+      var valCache = {};
       var data = undefined;
       var queryStr = '';
       var json = undefined;
@@ -17892,37 +17893,24 @@ var FormBase = (function (_React$Component) {
           }
           if (v === 'null') {
             obj[k] = null;
-          } else if (NESTED_VAL.test(v)) {
-            obj[k] = JSON.parse(v.replace(/\\|_∆∆_/g, ''));
+          } else if (valCache[v]) {
+            obj[k] = valCache[v];
           } else if (NUMBER_LIKE.test(v)) {
             obj[k] = parseFloat(v);
           }
         });
       }
 
-      function buildFileObject(files) {
-        var _files = [];
-        _lodash2['default'].each(files, function (file) {
-          _files.push({
-            lastModified: file.lastModified,
-            lastModifiedDate: file.lastModifiedDate,
-            name: file.name,
-            size: file.size,
-            type: file.type
-          });
-        });
-        return _files;
-      }
-
       for (var i = 0; i < len; i++) {
         if (typeof node.elements[i].getAttribute('data-serial') === 'string') {
           json = JSON.parse(node.elements[i].getAttribute('data-serial'));
           if (_lodash2['default'].isObject(json.value) || _lodash2['default'].isArray(json.value)) {
-            val = '_∆∆_' + JSON.stringify(json.value) + '_∆∆_';
+            val = CACHE_KEY + i;
+            valCache[val] = json.value;
           } else {
             if (node.elements[i].type === 'file' && node.elements[i].value) {
-              var fileObj = buildFileObject(node.elements[i].files);
-              val = '_∆∆_' + JSON.stringify(fileObj) + '_∆∆_';
+              val = CACHE_KEY + i;
+              valCache[val] = node.elements[i].files;
             } else if (node.elements[i].type === 'radio') {
               if (node.elements[i].checked) {
                 val = node.elements[i].value;
@@ -17940,13 +17928,11 @@ var FormBase = (function (_React$Component) {
           queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
         }
       }
-
       data = _qs2['default'].parse(queryStr, {
         depth: Infinity,
         parameterLimit: Infinity,
         arrayLimit: Infinity
       });
-
       mutateValues(data);
       return data;
     }

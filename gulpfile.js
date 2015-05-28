@@ -27,7 +27,9 @@ gulp.task('bundle', ['clean-browser'], function() {
       ],
       debug: true,
       standalone: 'SerialForms'
-    }).bundle();
+    })
+    .transform('browserify-shim')
+    .bundle();
   };
 
   browserifyBundle() // Unminified.

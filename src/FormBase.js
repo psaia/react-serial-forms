@@ -109,8 +109,9 @@ export default class FormBase extends React.Component {
    */
   serialize() {
     const node = React.findDOMNode(this);
-    const NESTED_VAL = /_∆∆_(.+?)_∆∆_/g;
+    const CACHE_KEY = '___CACHE___';
     const NUMBER_LIKE = /^[0-9.]+$/;
+    let valCache = {};
     let data;
     let queryStr = '';
     let json;
@@ -124,37 +125,24 @@ export default class FormBase extends React.Component {
         }
         if (v === 'null') {
           obj[k] = null;
-        } else if (NESTED_VAL.test(v)) {
-          obj[k] = JSON.parse(v.replace(/\\|_∆∆_/g, ''));
+        } else if (valCache[v]) {
+          obj[k] = valCache[v];
         } else if (NUMBER_LIKE.test(v)) {
           obj[k] = parseFloat(v);
         }
       });
     }
 
-    function buildFileObject(files) {
-      let _files = [];
-      _.each(files, (file) => {
-        _files.push({
-          lastModified: file.lastModified,
-          lastModifiedDate: file.lastModifiedDate,
-          name: file.name,
-          size: file.size,
-          type: file.type
-        });
-      });
-      return _files;
-    }
-
     for (let i = 0; i < len; i++) {
       if (typeof node.elements[i].getAttribute('data-serial') === 'string') {
         json = JSON.parse(node.elements[i].getAttribute('data-serial'));
         if (_.isObject(json.value) || _.isArray(json.value)) {
-          val = '_∆∆_' + JSON.stringify(json.value) + '_∆∆_';
+          val = CACHE_KEY + i;
+          valCache[val] = json.value;
         } else {
           if (node.elements[i].type === 'file' && node.elements[i].value) {
-            let fileObj = buildFileObject(node.elements[i].files);
-            val = '_∆∆_' + JSON.stringify(fileObj) + '_∆∆_';
+            val = CACHE_KEY + i;
+            valCache[val] = node.elements[i].files;
           } else if (node.elements[i].type === 'radio') {
             if (node.elements[i].checked) {
               val = node.elements[i].value;
@@ -172,13 +160,11 @@ export default class FormBase extends React.Component {
         queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
       }
     }
-
     data = Qs.parse(queryStr, {
       depth: Infinity,
       parameterLimit: Infinity,
       arrayLimit: Infinity
     });
-
     mutateValues(data);
     return data;
   }
