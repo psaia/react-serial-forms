@@ -81,7 +81,7 @@ how the field should validate.
 
 ## Validation
 
-Vaidation is specified on the `validation` attribute. Current, the following
+Vaidation is specified on the `validation` attribute. Currently, the following
 validators are included:
 
 * required
@@ -92,7 +92,9 @@ Multiple can be applied at one time by delimiting by a comma. Example:
 
 ```html
 <InputField validation='required' name='full_name' />
-<InputField validation='required,email' name='email' />
+<InputField validation='required,email' name='email' type='email' />
+<InputField validation='required,numeral' name='zip' type='number' />
+<InputField validation='required,number' name='other-number' type='text' />
 ```
 
 ## Serialization
