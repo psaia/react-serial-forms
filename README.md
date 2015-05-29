@@ -94,7 +94,7 @@ Multiple can be applied at one time by delimiting by a comma. Example:
 <InputField validation='required' name='full_name' />
 <InputField validation='required,email' name='email' type='email' />
 <InputField validation='required,numeral' name='zip' type='number' />
-<InputField validation='required,number' name='other-number' type='text' />
+<InputField validation='required,numeral' name='other-number' type='text' />
 ```
 
 ## Serialization
