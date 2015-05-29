@@ -25,7 +25,8 @@ Serial Forms aims to accomplish the following goals:
 
 # Example
 
-**[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**
+**[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**  
+
 This example demonstrates a very basic form with validation, a repeater field,
 and an undo button.
 
