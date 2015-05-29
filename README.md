@@ -106,6 +106,20 @@ processing. Thus, saving you tons of time.
 * `name="fruits[0][name]"` = `{ "fruits": [{"name": "<value>"}] }`
 * And so on. You can nest arrays and objects infinitely.
 
+You will more than likely want to obtain the serialized object `onSubmit`.
+
+```javascript
+onSubmit(e) {
+  let theform = this.refs.myform; // Grab from the refs.
+  theform.validate((valid) => {   // You may want to force validation.
+    if (valid) {
+      console.log(theform.serialize()); // Save to a store or something.
+    }
+  });
+}
+```
+
+
 **Files**
 
 `<InputField type='file' />`
