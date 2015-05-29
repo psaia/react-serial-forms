@@ -25,7 +25,7 @@ Serial Forms aims to accomplish the following goals:
 
 # Example
 
-**[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**  
+**[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**
 
 This example demonstrates a very basic form with validation, a repeater field,
 and an undo button.
@@ -79,11 +79,23 @@ These components except all of the attributes the native (react) components
 would, with the addition of a `validation` attribute that allows you to specify
 how the field should validate.
 
-#### Validation
+## Validation
 
-@TODO
+Vaidation is specified on the `validation` attribute. Current, the following
+validators are included:
 
-#### Serialization
+* required
+* numeral
+* email
+
+Multiple can be applied at one time by delimiting by a comma. Example:
+
+```html
+<InputField validation='required' name='full_name' />
+<InputField validation='required,email' name='email' />
+```
+
+## Serialization
 
 Serialization is based on the naming convention. This allows for the ability to
 easily create complex data structures in components without much post-submit
@@ -263,9 +275,11 @@ Would automatically create a serialized object like this:
 }
 ```
 
-#### Extending
+## Extending
 
 Extending this library is one of its main features. Please do.
+
+##### Extend complex third-party components.
 
 [Here](examples/DateTimeField.js) is an example of the [Date
 Picker](http://jquense.github.io/react-widgets/docs/#/datetime-picker) being
