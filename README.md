@@ -125,7 +125,6 @@ If the select field has `multiple={true}`, then the value will be an array.
 
 Simply pass the pre-populated value a `value` attribute.
 
-
 **Let's make a form.**
 
 ```javascript
@@ -266,6 +265,11 @@ Would automatically create a serialized object like this:
 #### Extending
 
 Extending this library is one of its main features. Please do.
+
+[Here](examples/DateTimeField.js) is an example of the [Date
+Picker](http://jquense.github.io/react-widgets/docs/#/datetime-picker) being
+extended. Using the technique of having a "host" hidden input allows us to
+handle any type of component - whether it returns a SyntheticEvent or not.
 
 ##### An example of creating a custom Form with react-bootstrap.
 

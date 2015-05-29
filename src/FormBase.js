@@ -96,7 +96,7 @@ export default class FormBase extends React.Component {
       if (fn) {
         fn(valid);
       }
-    }, 1);
+    }, 5);
   }
 
   /**
