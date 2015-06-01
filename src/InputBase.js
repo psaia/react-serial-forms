@@ -108,6 +108,15 @@ export default class InputBase extends React.Component {
   }
 
   /**
+   * Update state with new incoming props.
+   *
+   * @return {void}
+   */
+  componentWillReceiveProps(nextProps) {
+    this.updateAttrs(nextProps);
+  }
+
+  /**
    * A normalized and serialized json object to be stored as the data-serial
    * attribute for the field.
    *
