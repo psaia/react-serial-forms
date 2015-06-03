@@ -2,11 +2,18 @@ import React from 'react';
 import InputBase from '../InputBase';
 
 export default class SelectField extends InputBase {
-
+  /**
+   * @constructs SelectField
+   */
   constructor(props) {
     super(props);
   }
 
+  /**
+   * The only special attribute select boxes will need is `options`.
+   *
+   * @return {void}
+   */
   componentWillMount() {
     super.componentWillMount();
     this.updateAttrs(
@@ -40,6 +47,11 @@ export default class SelectField extends InputBase {
     }, this.ogOnChange.bind(this, event));
   }
 
+  /**
+   * Build the component.
+   *
+   * @return {object} ReactElement
+   */
   render() {
     let attrs = this.attrs();
     let errMessage = <span />;

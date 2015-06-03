@@ -17858,7 +17858,7 @@ var FormBase = (function (_React$Component) {
         if (fn) {
           fn(valid);
         }
-      }, 1);
+      }, 5);
     }
   }, {
     key: 'serialize',
@@ -18107,6 +18107,17 @@ var InputBase = (function (_React$Component) {
         return true;
       }
       return false;
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+
+    /**
+     * Update state with new incoming props.
+     *
+     * @return {void}
+     */
+    value: function componentWillReceiveProps(nextProps) {
+      this.updateAttrs(nextProps);
     }
   }, {
     key: 'serialize',

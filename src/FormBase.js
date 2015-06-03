@@ -72,7 +72,8 @@ export default class FormBase extends React.Component {
    * setup to listen to this event.
    *
    * Lastly, we do a dirty async check to see if any of the inputs have a
-   * validation error based on their class name.
+   * validation error based on their class name. A few milliseconds for slower
+   * browsers...
    *
    * @param {function} fn(valid){}
    * @return {void} true
@@ -80,23 +81,25 @@ export default class FormBase extends React.Component {
   validate(fn) {
     const node = React.findDOMNode(this);
     let len = node.elements.length;
+    let i = 0;
     let valid = true;
     let event = document.createEvent('Event');
     event.initEvent('validate', true, true);
 
-    setTimeout(function() {
-      for (let i = 0; i < len; i++) {
-        if (node.elements[i].getAttribute('data-serial')) {
-          node.elements[i].dispatchEvent(event);
-          if (valid && /error/.test(node.elements[i].getAttribute('class'))) {
-            valid = false;
-          }
+    function trigger() {
+      node.elements[i].dispatchEvent(event);
+      setTimeout(() => {
+        if (valid && /error/.test(node.elements[i].getAttribute('class'))) {
+          valid = false;
         }
-      }
-      if (fn) {
-        fn(valid);
-      }
-    }, 5);
+        if (i + 1 === len && fn) {
+          fn(valid);
+        } else {
+          trigger(++i);
+        }
+      }, 2);
+    }
+    trigger();
   }
 
   /**
@@ -168,15 +171,20 @@ export default class FormBase extends React.Component {
   }
 }
 
+/**
+ * Default properties.
+ */
 FormBase.defaultProps = {
   method: 'post',
   submitText: 'Submit',
   isLoading: false
 };
 
+/**
+ * Require some properties for sanity.
+ */
 FormBase.propTypes = {
   method: React.PropTypes.string.isRequired,
   submitText: React.PropTypes.string.isRequired,
   isLoading: React.PropTypes.bool.isRequired
 };
-
