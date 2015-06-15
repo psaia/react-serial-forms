@@ -211,6 +211,7 @@ export default class InputBase extends React.Component {
    */
   onChange(event) {
     const val = event.target.value;
+    event.persist();
     this.updateAttrs({
       value: val
     }, this.ogOnChange.bind(this, event));

@@ -17834,7 +17834,8 @@ var FormBase = (function (_React$Component) {
      * setup to listen to this event.
      *
      * Lastly, we do a dirty async check to see if any of the inputs have a
-     * validation error based on their class name.
+     * validation error based on their class name. A few milliseconds for slower
+     * browsers...
      *
      * @param {function} fn(valid){}
      * @return {void} true
@@ -17842,23 +17843,25 @@ var FormBase = (function (_React$Component) {
     value: function validate(fn) {
       var node = _react2['default'].findDOMNode(this);
       var len = node.elements.length;
+      var i = 0;
       var valid = true;
       var event = document.createEvent('Event');
       event.initEvent('validate', true, true);
 
-      setTimeout(function () {
-        for (var i = 0; i < len; i++) {
-          if (node.elements[i].getAttribute('data-serial')) {
-            node.elements[i].dispatchEvent(event);
-            if (valid && /error/.test(node.elements[i].getAttribute('class'))) {
-              valid = false;
-            }
+      function trigger() {
+        node.elements[i].dispatchEvent(event);
+        setTimeout(function () {
+          if (valid && /error/.test(node.elements[i].getAttribute('class'))) {
+            valid = false;
           }
-        }
-        if (fn) {
-          fn(valid);
-        }
-      }, 5);
+          if (i + 1 === len && fn) {
+            fn(valid);
+          } else {
+            trigger(++i);
+          }
+        }, 2);
+      }
+      trigger();
     }
   }, {
     key: 'serialize',
@@ -17937,12 +17940,18 @@ var FormBase = (function (_React$Component) {
 
 exports['default'] = FormBase;
 
+/**
+ * Default properties.
+ */
 FormBase.defaultProps = {
   method: 'post',
   submitText: 'Submit',
   isLoading: false
 };
 
+/**
+ * Require some properties for sanity.
+ */
 FormBase.propTypes = {
   method: _react2['default'].PropTypes.string.isRequired,
   submitText: _react2['default'].PropTypes.string.isRequired,
@@ -18501,6 +18510,10 @@ var _InputBase2 = require('../InputBase');
 var _InputBase3 = _interopRequireDefault(_InputBase2);
 
 var SelectField = (function (_InputBase) {
+  /**
+   * @constructs SelectField
+   */
+
   function SelectField(props) {
     _classCallCheck(this, SelectField);
 
@@ -18511,6 +18524,12 @@ var SelectField = (function (_InputBase) {
 
   _createClass(SelectField, [{
     key: 'componentWillMount',
+
+    /**
+     * The only special attribute select boxes will need is `options`.
+     *
+     * @return {void}
+     */
     value: function componentWillMount() {
       _get(Object.getPrototypeOf(SelectField.prototype), 'componentWillMount', this).call(this);
       this.updateAttrs({
@@ -18544,6 +18563,12 @@ var SelectField = (function (_InputBase) {
     }
   }, {
     key: 'render',
+
+    /**
+     * Build the component.
+     *
+     * @return {object} ReactElement
+     */
     value: function render() {
       var attrs = this.attrs();
       var errMessage = _react2['default'].createElement('span', null);
