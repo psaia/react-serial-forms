@@ -17916,6 +17916,8 @@ var FormBase = (function (_React$Component) {
               }
             } else if (json.value === 'null') {
               val = null;
+            } else if (node.elements[i].type === 'date') {
+              val = json.value;
             } else if (/^[0-9.]+/.test(json.value)) {
               val = parseFloat(json.value);
             } else {
@@ -18236,6 +18238,7 @@ var InputBase = (function (_React$Component) {
      */
     value: function onChange(event) {
       var val = event.target.value;
+      event.persist();
       this.updateAttrs({
         value: val
       }, this.ogOnChange.bind(this, event));
