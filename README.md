@@ -76,8 +76,8 @@ Without extending Serial Forms, the fields are very basic.
 * SelectField `<SelectField />`
 
 These components except all of the attributes the native (react) components
-would, with the addition of a `validation` attribute that allows you to specify
-how the field should validate.
+would, with the addition of a `validation` and `messages` attribute which 
+allows you to specify how the field should validate.
 
 ## Validation
 
