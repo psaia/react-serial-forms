@@ -85,12 +85,13 @@ input[type="email"] {
         }, 0);
       },
       undo: function() {
+        var self = this;
         this.setState(function(prev) {
           return {
             undoCache: prev.undoCache.pop(),
             addedPeople: prev.undoCache.last()
           }
-        });
+        }, self.updateSerialization);
       },
       addNewPerson: function() {
         var personIndex = this.state.addedPeople.size;

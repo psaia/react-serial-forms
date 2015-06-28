@@ -18065,18 +18065,10 @@ var InputBase = (function (_React$Component) {
         var types = this.props.validation.split(',');
         var i = 0;
         for (var len = types.length; i < len; i++) {
-          switch (types[i].trim()) {
-            case 'required':
-              this.validators.push(validators.isRequired);
-              break;
-            case 'email':
-              this.validators.push(validators.isEmail);
-              break;
-            case 'numeral':
-              this.validators.push(validators.isNumeral);
-              break;
-            default:
-              throw new Error('The validator supplied does not exist.');
+          for (var validator in validators) {
+            if (types[i].trim() === validators[validator].name) {
+              this.validators.push(validators[validator]);
+            }
           }
         }
       }
@@ -18271,9 +18263,15 @@ var InputBase = (function (_React$Component) {
       var val = value !== null ? value : this.attrs(true).get('value');
       var len = this.validators.length;
       var i = 0;
+      var msg = undefined;
       for (; i < len; i++) {
         if (this.validators[i].invalid(val)) {
-          return new _ValidationError2['default'](this.validators[i].message);
+          if (this.props.messages && this.props.messages[this.validators[i].name]) {
+            msg = this.props.messages[this.validators[i].name];
+          } else {
+            msg = this.validators[i].message;
+          }
+          return new _ValidationError2['default'](msg);
         }
       }
       if (!validators._isSupplied(val)) {
@@ -18808,21 +18806,24 @@ var _isSupplied = function _isSupplied(val) {
 
 var EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
-var isRequired = {
+var required = {
+  name: 'required',
   invalid: function invalid(value) {
     return !_isSupplied(value);
   },
   message: 'This field is required.'
 };
 
-var isEmail = {
+var email = {
+  name: 'email',
   invalid: function invalid(value) {
     return _isSupplied(value) && !EMAIL_PATTERN.test(value);
   },
   message: 'Email is invalid.'
 };
 
-var isNumeral = {
+var numeral = {
+  name: 'numeral',
   invalid: function invalid(value) {
     return _isSupplied(value) && !/^[0-9.]+$/.test(value);
   },
@@ -18830,9 +18831,9 @@ var isNumeral = {
 };
 
 exports['default'] = {
-  isRequired: isRequired,
-  isEmail: isEmail,
-  isNumeral: isNumeral,
+  required: required,
+  email: email,
+  numeral: numeral,
   _isSupplied: _isSupplied
 };
 module.exports = exports['default'];

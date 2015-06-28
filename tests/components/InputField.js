@@ -5,6 +5,7 @@ let React;
 let simulate;
 let expect;
 let TestUtils;
+let validators;
 
 let InputField;
 
@@ -18,6 +19,7 @@ const setupComponent = function(jsx) {
 before(function() {
   React = require('react/addons');
   InputField = require('../../src/fields/InputField.js');
+  validators = require('../../src/validators.js');
   TestUtils = React.addons.TestUtils;
   simulate = TestUtils.Simulate;
   expect = chai.expect;
@@ -78,6 +80,25 @@ describe('InputField', function() {
 
     serial = JSON.parse(input.getAttribute('data-serial'));
     expect(serial).eql({ name: 'my-field', value: null });
+  });
+
+  it('should allow for customized validation messages', function() {
+    let messages = {
+      required: 'I am unqiue.'
+    };
+    let el = setupComponent(<InputField name='my-field' validation='required' messages={messages} />);
+    let input = el.querySelector('input');
+
+    simulate.change(input, { target: { value: 'abc' }});
+    simulate.change(input, { target: { value: '' }});
+    expect(el.querySelector('.err-msg').innerHTML).to.equal(messages.required);
+
+    el = setupComponent(<InputField name='my-field' validation='required' />);
+    input = el.querySelector('input');
+
+    simulate.change(input, { target: { value: 'abc' }});
+    simulate.change(input, { target: { value: '' }});
+    expect(el.querySelector('.err-msg').innerHTML).to.equal(validators.required.message);
   });
 });
 

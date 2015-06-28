@@ -58,18 +58,10 @@ export default class InputBase extends React.Component {
       let types = this.props.validation.split(',');
       let i = 0;
       for (let len = types.length; i < len; i++) {
-        switch (types[i].trim()) {
-          case 'required' :
-            this.validators.push(validators.isRequired);
-            break;
-          case 'email':
-            this.validators.push(validators.isEmail);
-            break;
-          case 'numeral':
-            this.validators.push(validators.isNumeral);
-            break;
-          default:
-            throw new Error('The validator supplied does not exist.');
+        for (let validator in validators) {
+          if (types[i].trim() === validators[validator].name) {
+            this.validators.push(validators[validator]);
+          }
         }
       }
     }
@@ -240,9 +232,15 @@ export default class InputBase extends React.Component {
     let val = value !== null ? value : this.attrs(true).get('value');
     let len = this.validators.length;
     let i = 0;
+    let msg;
     for (; i < len; i++) {
       if (this.validators[i].invalid(val)) {
-        return new ValidationError(this.validators[i].message);
+        if (this.props.messages && this.props.messages[this.validators[i].name]) {
+          msg = this.props.messages[this.validators[i].name];
+        } else {
+          msg = this.validators[i].message;
+        }
+        return new ValidationError(msg);
       }
     }
     if (!validators._isSupplied(val)) {

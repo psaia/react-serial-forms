@@ -97,6 +97,25 @@ Multiple can be applied at one time by delimiting by a comma. Example:
 <InputField validation='required,numeral' name='other-number' type='text' />
 ```
 
+#### Custom Validation Messages
+
+Supply an object to the special `messages` attribute to customize the validation
+message for any of the validators.
+
+```javascript
+/**
+ * Format:
+ * <validator name>: <message>
+ *
+ * @type {object}
+ */
+let messages = {
+  required: 'I am a custom message for the required validator.'
+}
+```
+
+See the [extending](#extending) section to learn how to add more validators.
+
 ## Serialization
 
 Serialization is based on the naming convention. This allows for the ability to
@@ -330,7 +349,29 @@ export default class BootstrapForm extends FormBase {
 }
 ```
 
-@TODO More examples.
+##### Adding custom validators.
+
+Adding new validators is simple. Just extend the `validators` module. The key
+name is not important by the 3 properties in the object itself are.
+
+```javascript
+import { validators } from 'react-serial-forms';
+
+validators.zipcode = {
+
+  // This is the name of the validator. Provide this in the attribute for the
+  // input.
+  name: 'zipcode',
+
+  // Return true if the value for this field does not pass.
+  invalid: function(value) {
+    return !/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(value);
+  },
+
+  // Default message.
+  message: 'Email is invalid.'
+};
+```
 
 
 # Development

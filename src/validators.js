@@ -32,21 +32,24 @@ const _isSupplied = function(val) {
 
 const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 
-const isRequired = {
+const required = {
+  name: 'required',
   invalid: function(value) {
     return !_isSupplied(value);
   },
   message: 'This field is required.'
 };
 
-const isEmail = {
+const email = {
+  name: 'email',
   invalid: function(value) {
     return _isSupplied(value) && !EMAIL_PATTERN.test(value);
   },
   message: 'Email is invalid.'
 };
 
-const isNumeral = {
+const numeral = {
+  name: 'numeral',
   invalid: function(value) {
     return _isSupplied(value) && !/^[0-9.]+$/.test(value);
   },
@@ -54,8 +57,8 @@ const isNumeral = {
 };
 
 export default {
-  isRequired,
-  isEmail,
-  isNumeral,
+  required,
+  email,
+  numeral,
   _isSupplied
 };
