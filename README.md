@@ -112,6 +112,8 @@ message for any of the validators.
 let messages = {
   required: 'I am a custom message for the required validator.'
 }
+
+<InputField validation='required' name='full_name' messages={messages} />
 ```
 
 See the [extending](#extending) section to learn how to add more validators.
