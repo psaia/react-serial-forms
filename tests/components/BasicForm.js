@@ -80,5 +80,11 @@ describe('BasicForm', function() {
     simulate.change(DOMNode.querySelector('input'), { target: { value: '111:someval' }});
 
     expect(form.serialize().title).to.equal('111:someval');
+
+    simulate.change(DOMNode.querySelector('input'), { target: { value: '111.333' }});
+    expect(form.serialize().title).to.equal(111.333);
+
+    simulate.change(DOMNode.querySelector('input'), { target: { value: 111 }});
+    expect(form.serialize().title).to.equal(111);
   });
 });
