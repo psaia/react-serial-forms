@@ -56,7 +56,7 @@ describe('BasicForm', function() {
   it('should correctly serialize the form data', function() {
     let form = setupComponent(require('./test-forms/complex.js'));
     let DOMNode = React.findDOMNode(form);
-
+    let input = DOMNode.querySelector('input[name="company"]');
     let serializedObj = form.serialize();
 
     expect(serializedObj.title).to.equal(null);
@@ -72,9 +72,13 @@ describe('BasicForm', function() {
       'strawberry',
       'grapefruit'
     ]);
+
     expect(serializedObj.people.length).to.equal(2);
     expect(serializedObj.people[0].books.length).to.equal(2);
     expect(serializedObj.people[0].hobbies.length).to.equal(2);
-    // console.log(JSON.stringify(form.serialize(), null, 2));
+
+    simulate.change(DOMNode.querySelector('input'), { target: { value: '111:someval' }});
+
+    expect(form.serialize().title).to.equal('111:someval');
   });
 });

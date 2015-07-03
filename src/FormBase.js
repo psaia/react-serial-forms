@@ -154,7 +154,7 @@ export default class FormBase extends React.Component {
             val = null;
           } else if (node.elements[i].type === 'date') {
             val = json.value;
-          } else if (/^[0-9.]+/.test(json.value)) {
+          } else if (/^[0-9.]+$/.test(json.value)) {
             val = parseFloat(json.value);
           } else {
             val = json.value;
