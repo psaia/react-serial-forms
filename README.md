@@ -76,8 +76,8 @@ Without extending Serial Forms, the fields are very basic.
 * SelectField `<SelectField />`
 
 These components except all of the attributes the native (react) components
-would, with the addition of a `validation` attribute that allows you to specify
-how the field should validate.
+would, with the addition of a `validation` and `messages` attribute which 
+allows you to specify how the field should validate.
 
 ## Validation
 
@@ -97,7 +97,7 @@ Multiple can be applied at one time by delimiting by a comma. Example:
 <InputField validation='required,numeral' name='other-number' type='text' />
 ```
 
-#### Custom Validation Messages
+##### Custom Validation Messages
 
 Supply an object to the special `messages` attribute to customize the validation
 message for any of the validators.
@@ -142,8 +142,7 @@ onSubmit(e) {
 }
 ```
 
-
-**Files**
+##### Files
 
 `<InputField type='file' />`
 
@@ -151,11 +150,11 @@ Conveniently, the value for a file will be the actual `files` object. This will
 only be the case for newly added files of course. Otherwise, it will be whatever
 the value attribute is set to. Likely, the name of the file on the record.
 
-**Empty values**
+##### Empty values
 
 Empty values will always be `null`.
 
-**Select Field**
+##### Select Field
 
 Options should be specified with a collection of objects:
 
@@ -175,7 +174,71 @@ If the select field has `multiple={true}`, then the value will be an array.
 
 Simply pass the pre-populated value a `value` attribute.
 
-**Let's make a form.**
+
+## Extending
+
+Extending this library is one of its main features. Please do.
+
+##### Extend complex third-party components.
+
+[Here](examples/DateTimeField.js) is an example of the [Date
+Picker](http://jquense.github.io/react-widgets/docs/#/datetime-picker) being
+extended. Using the technique of having a "host" hidden input allows us to
+handle any type of component - whether it returns a SyntheticEvent or not.
+
+##### An example of creating a custom Form with react-bootstrap.
+
+```javascript
+import { React } from 'react';
+import { FormBase } from 'react-serial-forms';
+import { Grid, Row, ButtonInput, Col } from 'react-bootstrap';
+
+export default class BootstrapForm extends FormBase {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <form onSubmit={this.props.onSubmit} method={this.props.method}>
+        <Grid>
+          {this.props.children}
+          <Row>
+            <Col xs={12}>
+              <ButtonInput type='submit' bsStyle='primary' value={this.props.submitText} />
+            </Col>
+          </Row>
+        </Grid>
+      </form>
+    );
+  }
+}
+```
+
+##### Adding custom validators.
+
+Adding new validators is simple. Just extend the `validators` module. The key
+name is not important by the 3 properties in the object itself are.
+
+```javascript
+import { validators } from 'react-serial-forms';
+
+validators.zipcode = {
+
+  // This is the name of the validator. Provide this in the attribute for the
+  // input.
+  name: 'zipcode',
+
+  // Return true if the value for this field does not pass.
+  invalid: function(value) {
+    return !/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(value);
+  },
+
+  // Default message.
+  message: 'Email is invalid.'
+};
+```
+
+## Let's make a form.
 
 ```javascript
 import {
@@ -312,71 +375,12 @@ Would automatically create a serialized object like this:
 }
 ```
 
-## Extending
-
-Extending this library is one of its main features. Please do.
-
-##### Extend complex third-party components.
-
-[Here](examples/DateTimeField.js) is an example of the [Date
-Picker](http://jquense.github.io/react-widgets/docs/#/datetime-picker) being
-extended. Using the technique of having a "host" hidden input allows us to
-handle any type of component - whether it returns a SyntheticEvent or not.
-
-##### An example of creating a custom Form with react-bootstrap.
-
-```javascript
-import { React } from 'react';
-import { FormBase } from 'react-serial-forms';
-import { Grid, Row, ButtonInput, Col } from 'react-bootstrap';
-
-export default class BootstrapForm extends FormBase {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    return (
-      <form onSubmit={this.props.onSubmit} method={this.props.method}>
-        <Grid>
-          {this.props.children}
-          <Row>
-            <Col xs={12}>
-              <ButtonInput type='submit' bsStyle='primary' value={this.props.submitText} />
-            </Col>
-          </Row>
-        </Grid>
-      </form>
-    );
-  }
-}
-```
-
-##### Adding custom validators.
-
-Adding new validators is simple. Just extend the `validators` module. The key
-name is not important by the 3 properties in the object itself are.
-
-```javascript
-import { validators } from 'react-serial-forms';
-
-validators.zipcode = {
-
-  // This is the name of the validator. Provide this in the attribute for the
-  // input.
-  name: 'zipcode',
-
-  // Return true if the value for this field does not pass.
-  invalid: function(value) {
-    return !/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(value);
-  },
-
-  // Default message.
-  message: 'Email is invalid.'
-};
-```
-
 
 # Development
 
 * `npm install`
 * `npm test`
+
+# TODO's
+
+* More examples.
