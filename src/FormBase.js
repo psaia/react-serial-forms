@@ -111,7 +111,7 @@ export default class FormBase extends React.Component {
   serialize() {
     const node = React.findDOMNode(this);
     const CACHE_KEY = '___CACHE___';
-    const NUMBER_LIKE = /^\d*(?:\.{0,1}\d)*$/;
+    const NUMBER_LIKE = /^\d*(?:\.{1}\d+)?$/;
     let valCache = {};
     let data;
     let queryStr = '';

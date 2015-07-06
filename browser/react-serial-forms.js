@@ -17875,7 +17875,7 @@ var FormBase = (function (_React$Component) {
     value: function serialize() {
       var node = _react2['default'].findDOMNode(this);
       var CACHE_KEY = '___CACHE___';
-      var NUMBER_LIKE = /^\d*(?:\.{0,1}\d)*$/;
+      var NUMBER_LIKE = /^\d*(?:\.{1}\d+)?$/;
       var valCache = {};
       var data = undefined;
       var queryStr = '';
