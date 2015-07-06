@@ -111,7 +111,7 @@ export default class FormBase extends React.Component {
   serialize() {
     const node = React.findDOMNode(this);
     const CACHE_KEY = '___CACHE___';
-    const NUMBER_LIKE = /^[0-9.]+$/;
+    const NUMBER_LIKE = /^\d*(?:\.{0,1}\d)*$/;
     let valCache = {};
     let data;
     let queryStr = '';
@@ -152,10 +152,6 @@ export default class FormBase extends React.Component {
             }
           } else if (json.value === 'null') {
             val = null;
-          } else if (node.elements[i].type === 'date') {
-            val = json.value;
-          } else if (/^[0-9.]+$/.test(json.value)) {
-            val = parseFloat(json.value);
           } else {
             val = json.value;
           }

@@ -17875,7 +17875,7 @@ var FormBase = (function (_React$Component) {
     value: function serialize() {
       var node = _react2['default'].findDOMNode(this);
       var CACHE_KEY = '___CACHE___';
-      var NUMBER_LIKE = /^[0-9.]+$/;
+      var NUMBER_LIKE = /^\d*(?:\.{0,1}\d)*$/;
       var valCache = {};
       var data = undefined;
       var queryStr = '';
@@ -17916,10 +17916,6 @@ var FormBase = (function (_React$Component) {
               }
             } else if (json.value === 'null') {
               val = null;
-            } else if (node.elements[i].type === 'date') {
-              val = json.value;
-            } else if (/^[0-9.]+$/.test(json.value)) {
-              val = parseFloat(json.value);
             } else {
               val = json.value;
             }
