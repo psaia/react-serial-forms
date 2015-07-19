@@ -189,7 +189,7 @@ handle any type of component - whether it returns a SyntheticEvent or not.
 ##### An example of creating a custom Form with react-bootstrap.
 
 ```javascript
-import { React } from 'react';
+import React from 'react';
 import { FormBase } from 'react-serial-forms';
 import { Grid, Row, ButtonInput, Col } from 'react-bootstrap';
 
