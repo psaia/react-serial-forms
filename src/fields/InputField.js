@@ -26,16 +26,33 @@ export default class InputField extends InputBase {
   }
 
   /**
-   * We need special detection for checkboxes.
+   * We need special detection for certain types of inputs.
+   *
+   * Note: File inputs are special types of objects which are handled during
+   * form serialization.
    *
    * @param {object} event
    * @return {void}
    */
   onChange(event) {
     let val;
-    switch (event.target.type) {
+    const elType = event.nativeEvent.target.type;
+    switch (elType) {
       case 'checkbox':
         val = event.target.checked ? 'on' : 'off';
+        break;
+      case 'number':
+        val = parseFloat(event.target.value);
+        if (isNaN(val)) {
+          val = null;
+        }
+        break;
+      case 'radio':
+        if (event.target.checked) {
+          val = event.target.value;
+        } else {
+          val = null;
+        }
         break;
       default:
         return super.onChange(event);

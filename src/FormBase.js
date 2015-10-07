@@ -119,42 +119,29 @@ export default class FormBase extends React.Component {
     let val;
     let len = node.elements.length;
 
+    // This will iterate through the form object that Qs creates and de-cache
+    // each value.
     function mutateValues(obj) {
       _.forEach(obj, function(v, k) {
         if (_.isObject(v) || _.isArray(v)) {
           return mutateValues(v);
-        }
-        if (v === 'null') {
-          obj[k] = null;
-        } else if (valCache[v]) {
+        } else {
           obj[k] = valCache[v];
-        } else if (NUMBER_LIKE.test(v)) {
-          obj[k] = parseFloat(v);
         }
       });
     }
 
+    // Iterate through each element in the DOM and determine how to store the
+    // value in the element cache object. For example, a file type is a special
+    // type of input that shouldn't be serialized.
     for (let i = 0; i < len; i++) {
       if (typeof node.elements[i].getAttribute('data-serial') === 'string') {
         json = JSON.parse(node.elements[i].getAttribute('data-serial'));
-        if (_.isObject(json.value) || _.isArray(json.value)) {
-          val = CACHE_KEY + i;
-          valCache[val] = json.value;
+        val = CACHE_KEY + i;
+        if (node.elements[i].type === 'file' && node.elements[i].value) {
+          valCache[val] = node.elements[i].files;
         } else {
-          if (node.elements[i].type === 'file' && node.elements[i].value) {
-            val = CACHE_KEY + i;
-            valCache[val] = node.elements[i].files;
-          } else if (node.elements[i].type === 'radio') {
-            if (node.elements[i].checked) {
-              val = node.elements[i].value;
-            } else {
-              continue;
-            }
-          } else if (json.value === 'null') {
-            val = null;
-          } else {
-            val = json.value;
-          }
+          valCache[val] = json.value;
         }
         queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
       }

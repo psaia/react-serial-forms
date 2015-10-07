@@ -142,6 +142,12 @@ onSubmit(e) {
 }
 ```
 
+##### Numbers
+
+Numbers will be _real_ integer and float values when the `type='number'` is
+used on the Input field. Otherwise, they will be strings as the type suggests -
+text.
+
 ##### Files
 
 `<InputField type='file' />`
@@ -283,12 +289,12 @@ const form = (
 
         <div className='book'>
           <InputField value='devil in the white city' name='people[0][books][0][title]' />
-          <InputField value='2003' name='people[0][books][0][year]' />
+          <InputField type='number' value='2003' name='people[0][books][0][year]' />
         </div>
 
         <div className='book'>
           <InputField value='react' name='people[0][books][1][title]' />
-          <InputField value='2011' name='people[0][books][1][year]' />
+          <InputField type='number' value='2011' name='people[0][books][1][year]' />
         </div>
 
       </div>
@@ -303,12 +309,12 @@ const form = (
 
         <div className='book'>
           <InputField value='1984' name='people[1][books][0][title]' />
-          <InputField value='1950' name='people[1][books][0][year]' />
+          <InputField type='number' value='1950' name='people[1][books][0][year]' />
         </div>
 
         <div className='book'>
           <InputField value='dune' name='people[1][books][1][title]' />
-          <InputField value='1963' name='people[1][books][1][year]' />
+          <InputField type='number' value='1963' name='people[1][books][1][year]' />
         </div>
 
       </div>

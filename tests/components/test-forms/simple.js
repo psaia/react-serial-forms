@@ -19,7 +19,6 @@ const form = (
     <InputField name='email' validation='required,email' />
     <InputField name='company' />
     <InputField type='number' name='age' validation='numeral' />
-    <InputField name='age' format='money' />
     <TextareaField rows={5} cols={10} name='about' />
     <SelectField name='something' options={options} validation='required' />
   </BasicForm>

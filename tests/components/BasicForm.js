@@ -42,6 +42,25 @@ describe('BasicForm', function() {
 
     expect(isIdle(firstName().getAttribute('class'))).to.be.true;
 
+    // Test number inputs.
+    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '111' }});
+    simulate.change(DOMNode.querySelector('input[name="last_name"]'), { target: { value: '111' }});
+
+    expect(form.serialize().age).to.equal(111);
+    expect(form.serialize().last_name).to.equal('111');
+
+    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '123.333' }});
+    expect(form.serialize().age).to.equal(123.333);
+
+    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '' }});
+    expect(form.serialize().age).to.equal(null);
+
+    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 0 }});
+    expect(form.serialize().age).to.equal(0);
+
+    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 'abc' }});
+    expect(form.serialize().age).to.equal(null);
+
     // Do a validation and make sure the fields validated correctly.
     form.validate(function(valid) {
       expect(valid).to.be.false;
@@ -82,10 +101,10 @@ describe('BasicForm', function() {
     expect(form.serialize().title).to.equal('111:someval');
 
     simulate.change(DOMNode.querySelector('input'), { target: { value: '111.333' }});
-    expect(form.serialize().title).to.equal(111.333);
+    expect(form.serialize().title).to.equal('111.333');
 
-    simulate.change(DOMNode.querySelector('input'), { target: { value: 111 }});
-    expect(form.serialize().title).to.equal(111);
+    simulate.change(DOMNode.querySelector('input'), { target: { value: '111' }});
+    expect(form.serialize().title).to.equal('111');
 
     simulate.change(DOMNode.querySelector('input'), { target: { value: '111...111' }});
     expect(form.serialize().title).to.equal('111...111');

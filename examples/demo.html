@@ -29,6 +29,7 @@ input.error { border: 1px solid red; }
 
 textarea,
 input[type="text"],
+input[type="number"],
 input[type="email"] {
   padding: 10px;
   width: 300px;
@@ -170,6 +171,16 @@ input[type="email"] {
                   id='last_name'
                   name='Last Name'
                   validation='required'/>
+              </p>
+              <p>
+                <label htmlFor='last_name'>Age</label>
+                <InputField
+                  {...attrs}
+                  placeholder='22'
+                  type='number'
+                  step='0.5'
+                  id='age'
+                  name='age'/>
               </p>
               <p>
                 <label htmlFor='fruit'>Fruits*</label>
