@@ -116,12 +116,10 @@ let messages = {
 <InputField validation='required' name='full_name' messages={messages} />
 ```
 
-See the [extending](#extending) section to learn how to add more validators.
-
 ##### Custom Validators
 
-Creating a custom validator is simple. Validators are synchronous at the
-moment. They must be defined sometime before the component is mounted.
+Creating a custom validator is simple. [Validators are synchronous at the
+moment](https://github.com/LevInteractive/react-serial-forms/issues/10). They must be defined sometime before the component is mounted.
 
 ```javascript
 validation.registerValidator({
