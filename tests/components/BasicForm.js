@@ -58,9 +58,6 @@ describe('BasicForm', function() {
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 0 }});
     expect(form.serialize().age).to.equal(0);
 
-    simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 'abc' }});
-    expect(form.serialize().age).to.equal(null);
-
     // Do a validation and make sure the fields validated correctly.
     form.validate(function(valid) {
       expect(valid).to.be.false;

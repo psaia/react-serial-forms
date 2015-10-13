@@ -6,9 +6,10 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @module validators
+ * @module validation
  */
 import _ from 'lodash';
+import { Map } from 'immutable';
 
 const _isSupplied = function(val) {
   let value = val;
@@ -30,35 +31,65 @@ const _isSupplied = function(val) {
   return !_.isEmpty(value);
 };
 
-const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+class Validation {
+  constructor() {
+    this._VALIDATOR_CACHE_ = Map();
+    this._isSupplied = _isSupplied;
+  }
+  registerValidator(validationObject) {
+    if (!validationObject) {
+      throw new Error('A validation object is required.');
+    }
+    if (!validationObject.name) {
+      throw new Error('A \'name\' string is required.');
+    }
+    if (!validationObject.invalid) {
+      throw new Error('A \'name\' method is required.');
+    }
+    if (!validationObject.message) {
+      throw new Error('A \'message\' string is required.');
+    }
 
-const required = {
+    this._VALIDATOR_CACHE_ = this._VALIDATOR_CACHE_.set(
+      validationObject.name,
+      validationObject
+    );
+  }
+  collection() {
+    return this._VALIDATOR_CACHE_;
+  }
+}
+
+
+const validation = new Validation();
+
+/**
+ * Register some basic defaults.
+ */
+
+validation.registerValidator({
   name: 'required',
   invalid: function(value) {
     return !_isSupplied(value);
   },
   message: 'This field is required.'
-};
+});
 
-const email = {
+validation.registerValidator({
   name: 'email',
   invalid: function(value) {
+    const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return _isSupplied(value) && !EMAIL_PATTERN.test(value);
   },
   message: 'Email is invalid.'
-};
+});
 
-const numeral = {
+validation.registerValidator({
   name: 'numeral',
   invalid: function(value) {
     return _isSupplied(value) && !/^[0-9.]+$/.test(value);
   },
   message: 'Must be a number.'
-};
+});
 
-export default {
-  required,
-  email,
-  numeral,
-  _isSupplied
-};
+module.exports = validation;

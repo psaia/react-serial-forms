@@ -11,7 +11,7 @@
 import React from 'react';
 import { Map } from 'immutable';
 import ValidationError from './ValidationError';
-import * as validators from './validators';
+import validation from './validation';
 
 /**
  * Any field should implement this react component. This class will supply the
@@ -51,6 +51,7 @@ export default class InputBase extends React.Component {
    * @return {void}
    */
   componentWillMount() {
+    const availableValidators = validation.collection();
     this._onChange = this.props.onChange;
     this.updateAttrs(this.props);
 
@@ -58,11 +59,11 @@ export default class InputBase extends React.Component {
       let types = this.props.validation.split(',');
       let i = 0;
       for (let len = types.length; i < len; i++) {
-        for (let validator in validators) {
-          if (types[i].trim() === validators[validator].name) {
-            this.validators.push(validators[validator]);
+        availableValidators.forEach((validator) => {
+          if (types[i].trim() === validator.name) {
+            this.validators.push(validator);
           }
-        }
+        });
       }
     }
   }
@@ -121,7 +122,7 @@ export default class InputBase extends React.Component {
     let mutableAttrs = attrs.toJS();
     return JSON.stringify({
        name: mutableAttrs.name,
-       value: validators._isSupplied(mutableAttrs.value) ?
+       value: validation._isSupplied(mutableAttrs.value) ?
          mutableAttrs.value :
          null
     });
@@ -243,7 +244,7 @@ export default class InputBase extends React.Component {
         return new ValidationError(msg);
       }
     }
-    if (!validators._isSupplied(val)) {
+    if (!validation._isSupplied(val)) {
       return null;
     }
     return false;

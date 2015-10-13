@@ -5,7 +5,7 @@ let React;
 let simulate;
 let expect;
 let TestUtils;
-let validators;
+let validation;
 
 let InputField;
 
@@ -19,7 +19,7 @@ const setupComponent = function(jsx) {
 before(function() {
   React = require('react/addons');
   InputField = require('../../src/fields/InputField.js');
-  validators = require('../../src/validators.js');
+  validation = require('../../src/validation.js');
   TestUtils = React.addons.TestUtils;
   simulate = TestUtils.Simulate;
   expect = chai.expect;
@@ -98,7 +98,26 @@ describe('InputField', function() {
 
     simulate.change(input, { target: { value: 'abc' }});
     simulate.change(input, { target: { value: '' }});
-    expect(el.querySelector('.err-msg').innerHTML).to.equal(validators.required.message);
+    expect(el.querySelector('.err-msg').innerHTML).to.equal(validation.collection().get('required').message);
+  });
+
+  it('should handle a customer validator', function() {
+    validation.registerValidator({
+      name: 'largerThanFive',
+      invalid: function(value) {
+        return value < 5;
+      },
+      message: 'The field should be larger than 5.'
+    });
+
+    let el = setupComponent(<InputField type='number' name='my-field' validation='largerThanFive' />);
+    let input = el.querySelector('input');
+
+    simulate.change(input, { target: { value: 4 }});
+    expect(el.querySelector('.err-msg').innerHTML).to.equal('The field should be larger than 5.');
+
+    simulate.change(input, { target: { value: 6 }});
+    expect(el.querySelector('.err-msg')).to.equal(null);
   });
 });
 

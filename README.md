@@ -118,6 +118,23 @@ let messages = {
 
 See the [extending](#extending) section to learn how to add more validators.
 
+##### Custom Validators
+
+Creating a custom validator is simple. Validators are synchronous at the
+moment. They must be defined sometime before the component is mounted.
+
+```javascript
+validation.registerValidator({
+  name: 'largerThanFive',
+  invalid: function(value) {
+    return value < 5;
+  },
+  message: 'The field should be larger than 5.'
+});
+
+<InputField type='number' validation='largerThanFive' name='full_name' />
+```
+
 ## Serialization
 
 Serialization is based on the naming convention. This allows for the ability to
@@ -218,30 +235,6 @@ export default class BootstrapForm extends FormBase {
     );
   }
 }
-```
-
-##### Adding custom validators.
-
-Adding new validators is simple. Just extend the `validators` module. The key
-name is not important by the 3 properties in the object itself are.
-
-```javascript
-import { validators } from 'react-serial-forms';
-
-validators.zipcode = {
-
-  // This is the name of the validator. Provide this in the attribute for the
-  // input.
-  name: 'zipcode',
-
-  // Return true if the value for this field does not pass.
-  invalid: function(value) {
-    return !/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(value);
-  },
-
-  // Default message.
-  message: 'Email is invalid.'
-};
 ```
 
 ## Let's make a form.

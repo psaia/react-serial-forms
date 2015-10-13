@@ -18064,8 +18064,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -18082,9 +18080,9 @@ var _ValidationError = require('./ValidationError');
 
 var _ValidationError2 = _interopRequireDefault(_ValidationError);
 
-var _validators = require('./validators');
+var _validation = require('./validation');
 
-var validators = _interopRequireWildcard(_validators);
+var _validation2 = _interopRequireDefault(_validation);
 
 /**
  * Any field should implement this react component. This class will supply the
@@ -18142,19 +18140,24 @@ var InputBase = (function (_React$Component) {
   _createClass(InputBase, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
+      var _this2 = this;
+
+      var availableValidators = _validation2['default'].collection();
       this._onChange = this.props.onChange;
       this.updateAttrs(this.props);
 
       if (this.props.validation) {
-        var types = this.props.validation.split(',');
-        var i = 0;
-        for (var len = types.length; i < len; i++) {
-          for (var validator in validators) {
-            if (types[i].trim() === validators[validator].name) {
-              this.validators.push(validators[validator]);
-            }
+        (function () {
+          var types = _this2.props.validation.split(',');
+          var i = 0;
+          for (var len = types.length; i < len; i++) {
+            availableValidators.forEach(function (validator) {
+              if (types[i].trim() === validator.name) {
+                _this2.validators.push(validator);
+              }
+            });
           }
-        }
+        })();
       }
     }
 
@@ -18168,12 +18171,12 @@ var InputBase = (function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
+      var _this3 = this;
 
       this._hasMounted = true;
       _react2['default'].findDOMNode(this).addEventListener('validate', function (e) {
-        _this2.setState({
-          error: _this2.validate(_this2.attrs(true).get('value'))
+        _this3.setState({
+          error: _this3.validate(_this3.attrs(true).get('value'))
         });
       });
     }
@@ -18222,7 +18225,7 @@ var InputBase = (function (_React$Component) {
       var mutableAttrs = attrs.toJS();
       return JSON.stringify({
         name: mutableAttrs.name,
-        value: validators._isSupplied(mutableAttrs.value) ? mutableAttrs.value : null
+        value: _validation2['default']._isSupplied(mutableAttrs.value) ? mutableAttrs.value : null
       });
     }
 
@@ -18270,7 +18273,7 @@ var InputBase = (function (_React$Component) {
   }, {
     key: 'updateAttrs',
     value: function updateAttrs() {
-      var _this3 = this;
+      var _this4 = this;
 
       var opts = [];
       var updated = function updated() {};
@@ -18293,9 +18296,9 @@ var InputBase = (function (_React$Component) {
           attrs: prev.attrs.merge.apply(prev.attrs, opts)
         };
         obj.attrs = obj.attrs.update('data-serial', function (v) {
-          return _this3.serialize(obj.attrs);
+          return _this4.serialize(obj.attrs);
         });
-        obj.error = _this3._hasMounted ? _this3.validate(obj.attrs.toJS().value) : null;
+        obj.error = _this4._hasMounted ? _this4.validate(obj.attrs.toJS().value) : null;
         return obj;
       }, updated);
     }
@@ -18358,7 +18361,7 @@ var InputBase = (function (_React$Component) {
           return new _ValidationError2['default'](msg);
         }
       }
-      if (!validators._isSupplied(val)) {
+      if (!_validation2['default']._isSupplied(val)) {
         return null;
       }
       return false;
@@ -18393,7 +18396,7 @@ module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./ValidationError":10,"./validators":16,"immutable":1}],10:[function(require,module,exports){
+},{"./ValidationError":10,"./validation":16,"immutable":1}],10:[function(require,module,exports){
 /**
  * Copyright 2015, Lev Interactive, LLC.
  * All rights reserved.
@@ -18875,9 +18878,9 @@ var _ValidationError = require('./ValidationError');
 
 var _ValidationError2 = _interopRequireDefault(_ValidationError);
 
-var _validators = require('./validators');
+var _validation = require('./validation');
 
-var _validators2 = _interopRequireDefault(_validators);
+var _validation2 = _interopRequireDefault(_validation);
 
 var _InputBase = require('./InputBase');
 
@@ -18905,7 +18908,7 @@ var _formsBasicForm2 = _interopRequireDefault(_formsBasicForm);
 
 exports['default'] = {
   ValidationError: _ValidationError2['default'],
-  validators: _validators2['default'],
+  validation: _validation2['default'],
   FormBase: _FormBase2['default'],
   InputBase: _InputBase2['default'],
   InputField: _fieldsInputField2['default'],
@@ -18915,7 +18918,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./FormBase":8,"./InputBase":9,"./ValidationError":10,"./fields/InputField":11,"./fields/SelectField":12,"./fields/TextareaField":13,"./forms/BasicForm":14,"./validators":16}],16:[function(require,module,exports){
+},{"./FormBase":8,"./InputBase":9,"./ValidationError":10,"./fields/InputField":11,"./fields/SelectField":12,"./fields/TextareaField":13,"./forms/BasicForm":14,"./validation":16}],16:[function(require,module,exports){
 /**
  * Copyright 2015, Lev Interactive, LLC.
  * All rights reserved.
@@ -18924,19 +18927,21 @@ module.exports = exports['default'];
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @module validators
+ * @module validation
  */
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
+
+var _immutable = require('immutable');
 
 var _isSupplied = function _isSupplied(val) {
   var value = val;
@@ -18958,41 +18963,76 @@ var _isSupplied = function _isSupplied(val) {
   return !_lodash2['default'].isEmpty(value);
 };
 
-var EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+var Validation = (function () {
+  function Validation() {
+    _classCallCheck(this, Validation);
 
-var required = {
+    this._VALIDATOR_CACHE_ = (0, _immutable.Map)();
+    this._isSupplied = _isSupplied;
+  }
+
+  _createClass(Validation, [{
+    key: 'registerValidator',
+    value: function registerValidator(validationObject) {
+      if (!validationObject) {
+        throw new Error('A validation object is required.');
+      }
+      if (!validationObject.name) {
+        throw new Error('A \'name\' string is required.');
+      }
+      if (!validationObject.invalid) {
+        throw new Error('A \'name\' method is required.');
+      }
+      if (!validationObject.message) {
+        throw new Error('A \'message\' string is required.');
+      }
+
+      this._VALIDATOR_CACHE_ = this._VALIDATOR_CACHE_.set(validationObject.name, validationObject);
+    }
+  }, {
+    key: 'collection',
+    value: function collection() {
+      return this._VALIDATOR_CACHE_;
+    }
+  }]);
+
+  return Validation;
+})();
+
+var validation = new Validation();
+
+/**
+ * Register some basic defaults.
+ */
+
+validation.registerValidator({
   name: 'required',
   invalid: function invalid(value) {
     return !_isSupplied(value);
   },
   message: 'This field is required.'
-};
+});
 
-var email = {
+validation.registerValidator({
   name: 'email',
   invalid: function invalid(value) {
+    var EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return _isSupplied(value) && !EMAIL_PATTERN.test(value);
   },
   message: 'Email is invalid.'
-};
+});
 
-var numeral = {
+validation.registerValidator({
   name: 'numeral',
   invalid: function invalid(value) {
     return _isSupplied(value) && !/^[0-9.]+$/.test(value);
   },
   message: 'Must be a number.'
-};
+});
 
-exports['default'] = {
-  required: required,
-  email: email,
-  numeral: numeral,
-  _isSupplied: _isSupplied
-};
-module.exports = exports['default'];
+module.exports = validation;
 
-},{"lodash":2}]},{},[15])(15)
+},{"immutable":1,"lodash":2}]},{},[15])(15)
 });
 
 

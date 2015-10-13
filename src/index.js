@@ -7,7 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 import ValidationError from './ValidationError';
-import validators from './validators';
+import validation from './validation';
 import InputBase from './InputBase';
 import FormBase from './FormBase';
 import InputField from './fields/InputField';
@@ -17,7 +17,7 @@ import BasicForm from './forms/BasicForm';
 
 export default {
   ValidationError,
-  validators,
+  validation,
   FormBase,
   InputBase,
   InputField,
