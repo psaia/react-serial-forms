@@ -8,7 +8,9 @@ that represents the input's value which may or may not be on the input itself.
 This separation of concerns makes it easy to work with third party components
 like [Bootstrap](http://react-bootstrap.github.io/) and [React
 Widgets](http://jquense.github.io/react-widgets/docs/#/) or your own custom
-components.
+components. For example - you can create a complex component containing multiple
+`<input>` elements which produces one result in your serialized object, essentially
+acting as one field.
 
 Serial Forms aims to accomplish the following goals:
 
