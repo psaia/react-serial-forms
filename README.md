@@ -1,6 +1,6 @@
 # Serial Forms
 
-Forms don't have to be horrible. This module is a light abstraction over
+This library is a light abstraction over
 [React forms](https://facebook.github.io/react/docs/forms.html) that allows for
 customizable layouts for various types of data schemas. Serial Forms decouples
 the input itself from the data it generates by creating a serialized object
