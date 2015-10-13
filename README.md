@@ -379,7 +379,3 @@ Would automatically create a serialized object like this:
 
 * `npm install`
 * `npm test`
-
-# TODO's
-
-* More examples.
