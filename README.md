@@ -379,3 +379,4 @@ Would automatically create a serialized object like this:
 
 * `npm install`
 * `npm test`
+* Make sure your IDE is eslint capable!
