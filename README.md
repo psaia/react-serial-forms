@@ -20,9 +20,8 @@ Serial Forms aims to accomplish the following goals:
 * Must be easily extendable and work with any type of custom component (date
     pickers, bootstrap components, ect.). It should be a good foundation for
     other form frameworks and abstractions.
-* Must make use of immutable data (via
-    [immutable.js](http://facebook.github.io/immutable-js/)).
-* Must be built with performance and compatibility in mind and well tested.
+* [Immutable](http://facebook.github.io/immutable-js/) internal data structures.
+* Built with performance and compatibility in mind and well tested.
 * Source code must be as good as any documentation.
 
 # Example
