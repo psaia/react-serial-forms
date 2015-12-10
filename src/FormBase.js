@@ -9,6 +9,7 @@
  * @module FormBase
  */
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Qs from 'qs';
 import _ from 'lodash';
 
@@ -79,7 +80,7 @@ export default class FormBase extends React.Component {
    * @return {void} true
    */
   validate(fn) {
-    const node = React.findDOMNode(this);
+    const node = ReactDOM.findDOMNode(this);
     let len = node.elements.length;
     let i = 0;
     let valid = true;
@@ -109,7 +110,7 @@ export default class FormBase extends React.Component {
    * @return {array} collection
    */
   serialize() {
-    const node = React.findDOMNode(this);
+    const node = ReactDOM.findDOMNode(this);
     const CACHE_KEY = '___CACHE___';
     const NUMBER_LIKE = /^\d*(?:\.{1}\d+)?$/;
     let valCache = {};

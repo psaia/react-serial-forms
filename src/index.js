@@ -16,12 +16,12 @@ import SelectField from './fields/SelectField';
 import BasicForm from './forms/BasicForm';
 
 export default {
-  ValidationError,
-  validation,
-  FormBase,
-  InputBase,
-  InputField,
-  TextareaField,
-  SelectField,
-  BasicForm
+	ValidationError,
+	validation,
+	FormBase,
+	InputBase,
+	InputField,
+	TextareaField,
+	SelectField,
+	BasicForm
 };
