@@ -2,6 +2,7 @@
 import chai from 'chai';
 
 let React;
+let ReactDOM;
 let simulate;
 let expect;
 let TestUtils;
@@ -11,14 +12,15 @@ let SelectField;
 // Render react element into the DOM.
 const setupComponent = function(jsx) {
   let renderedComponent = TestUtils.renderIntoDocument(jsx);
-  return React.findDOMNode(renderedComponent);
+  return ReactDOM.findDOMNode(renderedComponent);
 };
 
 // Load up react since the DOM is ready.
 before(function() {
-  React = require('react/addons');
+  React = require('react');
+  ReactDOM = require('react-dom');
   SelectField = require('../../src/fields/SelectField.js');
-  TestUtils = React.addons.TestUtils;
+  TestUtils = require('react-addons-test-utils');
   simulate = TestUtils.Simulate;
   expect = chai.expect;
 });
@@ -64,7 +66,7 @@ describe('SelectField', function() {
       { text: 'Bar', value: 'bar' }
     ];
     let instance = TestUtils.renderIntoDocument(<SelectField multiple={true} options={options} name='my-field' />);
-    let el = React.findDOMNode(instance);
+    let el = ReactDOM.findDOMNode(instance);
 
     const select = el.querySelector('select');
 
@@ -120,4 +122,3 @@ describe('SelectField', function() {
     expect(serial).eql({ name: 'my-field', value: 'foo' });
   });
 });
-
