@@ -31,7 +31,8 @@
     "immutable": "^3.7.3"
   },
   "peerDependencies": {
-    "react": ">=0.13.0"
+    "react": ">=0.14.3",
+    "react-dom": ">=0.14.3"
   },
   "devDependencies": {
     "babel": "^5.4.7",
@@ -48,6 +49,7 @@
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
+    "react-addons-test-utils": "^0.14.3",
     "testdom": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"

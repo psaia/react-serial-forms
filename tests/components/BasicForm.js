@@ -2,7 +2,7 @@
 /*eslint no-unused-expressions: 0, no-unused-vars: 0 */
 import chai from 'chai';
 
-let React;
+let ReactDOM;
 let simulate;
 let expect;
 let TestUtils;
@@ -27,8 +27,8 @@ const isError = function(classname) {
 
 // Load up react since the DOM is ready.
 before(function() {
-  React = require('react/addons');
-  TestUtils = React.addons.TestUtils;
+  ReactDOM = require('react-dom');
+  TestUtils = require('react-addons-test-utils');
   simulate = TestUtils.Simulate;
   expect = chai.expect;
 });
@@ -36,7 +36,7 @@ before(function() {
 describe('BasicForm', function() {
   it('should cause all inputs to validate on validate()', function(done) {
     let form = setupComponent(require('./test-forms/simple.js'));
-    let DOMNode = React.findDOMNode(form);
+    let DOMNode = ReactDOM.findDOMNode(form);
     let firstName = () => DOMNode.querySelector('input[name="first_name"]');
     let company = () => DOMNode.querySelector('input[name="company"]');
 
@@ -71,7 +71,7 @@ describe('BasicForm', function() {
 
   it('should correctly serialize the form data', function() {
     let form = setupComponent(require('./test-forms/complex.js'));
-    let DOMNode = React.findDOMNode(form);
+    let DOMNode = ReactDOM.findDOMNode(form);
     let input = DOMNode.querySelector('input[name="company"]');
     let serializedObj = form.serialize();
 

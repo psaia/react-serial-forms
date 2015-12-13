@@ -2,6 +2,7 @@
 import chai from 'chai';
 
 let React;
+let ReactDOM;
 let simulate;
 let expect;
 let TestUtils;
@@ -12,15 +13,16 @@ let InputField;
 // Render react element into the DOM.
 const setupComponent = function(jsx) {
   let renderedComponent = TestUtils.renderIntoDocument(jsx);
-  return React.findDOMNode(renderedComponent);
+  return ReactDOM.findDOMNode(renderedComponent);
 };
 
 // Load up react since the DOM is ready.
 before(function() {
-  React = require('react/addons');
+  React = require('react');
+  ReactDOM = require('react-dom');
   InputField = require('../../src/fields/InputField.js');
   validation = require('../../src/validation.js');
-  TestUtils = React.addons.TestUtils;
+  TestUtils = require('react-addons-test-utils');
   simulate = TestUtils.Simulate;
   expect = chai.expect;
 });
@@ -120,4 +122,3 @@ describe('InputField', function() {
     expect(el.querySelector('.err-msg')).to.equal(null);
   });
 });
-
