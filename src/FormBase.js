@@ -119,6 +119,7 @@ export default class FormBase extends React.Component {
     let json;
     let val;
     let len = node.elements.length;
+    let ignoreValue = false;
 
     // This will iterate through the form object that Qs creates and de-cache
     // each value.
@@ -144,7 +145,9 @@ export default class FormBase extends React.Component {
         } else {
           valCache[val] = json.value;
         }
-        queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
+        if (!ignoreValue) {
+          queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
+        }
       }
     }
     data = Qs.parse(queryStr, {
