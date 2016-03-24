@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import shallowEqual from 'fbjs/lib/shallowEqual';
 import { Map } from 'immutable';
 import ValidationError from './ValidationError';
 import validation from './validation';
@@ -107,7 +108,9 @@ export default class InputBase extends React.Component {
    * @return {void}
    */
   componentWillReceiveProps(nextProps) {
-    this.updateAttrs(nextProps);
+    if (!shallowEqual(this.props, nextProps)) {
+      this.updateAttrs(nextProps);
+    }
   }
 
   /**
