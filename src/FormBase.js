@@ -119,6 +119,7 @@ export default class FormBase extends React.Component {
     let json;
     let val;
     let len = node.elements.length;
+    let ignoreValue = false;
 
     // This will iterate through the form object that Qs creates and de-cache
     // each value.
@@ -137,14 +138,23 @@ export default class FormBase extends React.Component {
     // type of input that shouldn't be serialized.
     for (let i = 0; i < len; i++) {
       if (typeof node.elements[i].getAttribute('data-serial') === 'string') {
+        ignoreValue = false;
         json = JSON.parse(node.elements[i].getAttribute('data-serial'));
         val = CACHE_KEY + i;
         if (node.elements[i].type === 'file' && node.elements[i].value) {
           valCache[val] = node.elements[i].files;
+        } else if (node.elements[i].type === 'radio') {
+          if (node.elements[i].checked) {
+            valCache[val] = json.value;
+          } else {
+            ignoreValue = true;
+          }
         } else {
           valCache[val] = json.value;
         }
-        queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
+        if (!ignoreValue) {
+          queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
+        }
       }
     }
     data = Qs.parse(queryStr, {
