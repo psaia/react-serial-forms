@@ -121,4 +121,18 @@ describe('InputField', function() {
     simulate.change(input, { target: { value: 6 }});
     expect(el.querySelector('.err-msg')).to.equal(null);
   });
+
+  it('should handle a promise validator', function() {
+    validation.registerValidator({
+      name: 'usernameIsUnique',
+      invalid: function(value) {
+        return value < 5;
+      },
+      message: 'Username is unqiue.'
+    });
+
+    let el = setupComponent(<InputField type='text' name='username' validation='usernameIsUnique' />);
+    let input = el.querySelector('input');
+
+  });
 });

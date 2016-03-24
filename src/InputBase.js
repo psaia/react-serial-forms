@@ -11,8 +11,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Map } from 'immutable';
+import { some } from 'lodash';
 import ValidationError from './ValidationError';
 import validation from './validation';
+import Promise from 'bluebird';
 
 /**
  * Any field should implement this react component. This class will supply the
@@ -79,9 +81,7 @@ export default class InputBase extends React.Component {
   componentDidMount() {
     this._hasMounted = true;
     ReactDOM.findDOMNode(this).addEventListener('validate', (e) => {
-      this.setState({
-        error: this.validate(this.attrs(true).get('value'))
-      });
+      this.validate(this.attrs(true).get('value'));
     });
   }
 
@@ -187,8 +187,13 @@ export default class InputBase extends React.Component {
       let obj = {
         attrs: prev.attrs.merge.apply(prev.attrs, opts)
       };
+
       obj.attrs = obj.attrs.update('data-serial', v => this.serialize(obj.attrs));
-      obj.error = this._hasMounted ? this.validate(obj.attrs.toJS().value) : null;
+
+      if (this._hasMounted) {
+        this.validate(obj.attrs.toJS().value);
+      }
+
       return obj;
     }, updated);
   }
@@ -231,24 +236,34 @@ export default class InputBase extends React.Component {
    *                 false if supplied and valid.
    */
   validate(value) {
-    let val = value !== null ? value : this.attrs(true).get('value');
-    let len = this.validators.length;
-    let i = 0;
-    let msg;
-    for (; i < len; i++) {
-      if (this.validators[i].invalid(val)) {
-        if (this.props.messages && this.props.messages[this.validators[i].name]) {
-          msg = this.props.messages[this.validators[i].name];
-        } else {
-          msg = this.validators[i].message;
+    return new Promise((resolve, reject) => {
+      let val = value !== null ? value : this.attrs(true).get('value');
+      let msg;
+
+      const vs = this.validators.map((validator) => validator.invalid(val));
+
+      Promise.all(vs).then((isInvalid) => {
+        let i = 0;
+        let len = isInvalid.length;
+
+        for (; i < len; i++) {
+          if (isInvalid[i]) {
+            if (this.props.messages && this.props.messages[this.validators[i].name]) {
+              msg = this.props.messages[this.validators[i].name];
+            } else {
+              msg = this.validators[i].message;
+            }
+            return reject(new ValidationError(msg));
+          }
         }
-        return new ValidationError(msg);
+      });
+
+      if (!validation._isSupplied(val)) {
+        return resolve(null);
       }
-    }
-    if (!validation._isSupplied(val)) {
-      return null;
-    }
-    return false;
+
+      return resolve(false);
+    });
   }
 
   /**
