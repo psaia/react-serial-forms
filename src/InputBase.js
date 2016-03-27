@@ -81,7 +81,11 @@ export default class InputBase extends React.Component {
   componentDidMount() {
     this._hasMounted = true;
     ReactDOM.findDOMNode(this).addEventListener('validate', (e) => {
-      this.validate(this.attrs(true).get('value'));
+      this.validate(this.attrs(true).get('value')).then((err) => {
+        this.setState({
+          error: err
+        });
+      });
     });
   }
 

@@ -65,7 +65,7 @@ describe('BasicForm', function() {
       expect(isError(firstName().getAttribute('class'))).to.be.true;
       expect(isError(company().getAttribute('class'))).to.be.false;
 
-      done();
+      // done();
     });
   });
 
