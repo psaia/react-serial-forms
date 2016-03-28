@@ -12,6 +12,7 @@ const options = [
   { text: 'Bar', value: 'bar' }
 ];
 
+
 const form = (
   <BasicForm>
     <InputField name='first_name' validation='required' />

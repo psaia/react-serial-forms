@@ -43,8 +43,8 @@ class Validation {
     if (!validationObject.name) {
       throw new Error('A \'name\' string is required.');
     }
-    if (!validationObject.invalid) {
-      throw new Error('A \'name\' method is required.');
+    if (!validationObject.determine) {
+      throw new Error('A \'determine\' method is required.');
     }
     if (!validationObject.message) {
       throw new Error('A \'message\' string is required.');
@@ -69,25 +69,34 @@ const validation = new Validation();
 
 validation.registerValidator({
   name: 'required',
-  invalid: function(value) {
-    return !_isSupplied(value);
+  determine: function(value, resolve, reject) {
+    if (_isSupplied(value)) {
+      return resolve();
+    }
+    reject();
   },
   message: 'This field is required.'
 });
 
 validation.registerValidator({
   name: 'email',
-  invalid: function(value) {
+  determine: function(value, resolve, reject) {
     const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return _isSupplied(value) && !EMAIL_PATTERN.test(value);
+    if (_isSupplied(value) && !EMAIL_PATTERN.test(value)) {
+      return reject();
+    }
+    resolve();
   },
   message: 'Email is invalid.'
 });
 
 validation.registerValidator({
   name: 'numeral',
-  invalid: function(value) {
-    return _isSupplied(value) && !/^[0-9.]+$/.test(value);
+  determine: function(value, resolve, reject) {
+    if (_isSupplied(value) && !/^[0-9.]+$/.test(value)) {
+      return reject();
+    }
+    resolve();
   },
   message: 'Must be a number.'
 });

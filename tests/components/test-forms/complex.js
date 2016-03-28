@@ -18,10 +18,10 @@ const form = (
     <InputField name='title' validation='required' />
 
     <div className='simpleList'>
-      <InputField value='apple' name='fruits[]' />
-      <InputField value='orange' name='fruits[]' />
-      <InputField value='strawberry' name='fruits[]' />
-      <InputField value='grapefruit' name='fruits[]' />
+      <InputField value='apple' name='fruits[0]' />
+      <InputField value='orange' name='fruits[1]' />
+      <InputField value='strawberry' name='fruits[2]' />
+      <InputField value='grapefruit' name='fruits[3]' />
     </div>
 
     <div className='simpleList-numbered'>

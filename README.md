@@ -80,6 +80,14 @@ These components except all of the attributes the native (react) components
 would, with the addition of a `validation` and `messages` attribute which
 allows you to specify how the field should validate.
 
+## States of an input
+
+These will appear as classes on the component.
+
+* `fresh`: Newly constructed. Has not yet validated or changed.
+* `valid`: Passed validation(s).
+* `invalid`: Did not pass validation(s).
+
 ## Validation
 
 Vaidation is specified on the `validation` attribute. Currently, the following

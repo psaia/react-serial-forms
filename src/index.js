@@ -8,6 +8,7 @@
  */
 import ValidationError from './ValidationError';
 import validation from './validation';
+import state from './state';
 import InputBase from './InputBase';
 import FormBase from './FormBase';
 import InputField from './fields/InputField';
@@ -18,6 +19,7 @@ import BasicForm from './forms/BasicForm';
 export default {
   ValidationError,
   validation,
+  state,
   FormBase,
   InputBase,
   InputField,

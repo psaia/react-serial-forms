@@ -11,7 +11,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Map } from 'immutable';
-import { some } from 'lodash';
+import { assign, noop } from 'lodash';
+import { registerInput, inputValue, destroyInput } from './state';
 import ValidationError from './ValidationError';
 import validation from './validation';
 import Promise from 'bluebird';
@@ -36,15 +37,7 @@ export default class InputBase extends React.Component {
     this._onChange = null;
     this._hasMounted = false;
     this.state = {
-      error: false,
-      attrs: Map({
-        className: 'serial-form-input',
-        'data-serial': '{}',
-        onBlur: () => {
-          this.validate();
-        },
-        value: null
-      })
+      error: null
     };
   }
 
@@ -54,9 +47,14 @@ export default class InputBase extends React.Component {
    * @return {void}
    */
   componentWillMount() {
+    registerInput(
+      this.context.formName,
+      this.props.name,
+      this.getInitialValue(),
+      this.validate.bind(this)
+    );
+
     const availableValidators = validation.collection();
-    this._onChange = this.props.onChange;
-    this.updateAttrs(this.props);
 
     if (this.props.validation) {
       let types = this.props.validation.split(',');
@@ -80,201 +78,154 @@ export default class InputBase extends React.Component {
    */
   componentDidMount() {
     this._hasMounted = true;
-    ReactDOM.findDOMNode(this).addEventListener('validate', (e) => {
-      this.validate(this.attrs(true).get('value')).then((err) => {
-        this.setState({
-          error: err
-        });
-      });
-    });
   }
 
   /**
-   * A custom implementation using immutable.js comparisons.
+   * Remove from memory.
    *
-   * @param {object} nextProps
-   * @param {object} nextState
-   * @return {boolean}
+   * @return {void}
    */
-  shouldComponentUpdate(nextProps, nextState) {
-    let attrsAreSame = this.state.attrs.equals(nextState.attrs);
-    let errsAreSame = this.state.error === nextState.error;
-    if (!attrsAreSame || !errsAreSame) {
-      return true;
-    }
-    return false;
+  componentWillUnmount() {
+    destroyInput(this.context.formName, this.props.name);
   }
 
   /**
-   * Update state with new incoming props.
+   * If updating with a new value, update the state.
    *
    * @return {void}
    */
   componentWillReceiveProps(nextProps) {
-    this.updateAttrs(nextProps);
-  }
+    const val = inputValue(this.context.formName, this.props.name);
 
-  /**
-   * A normalized and serialized json object to be stored as the data-serial
-   * attribute for the field.
-   *
-   * @param {?object} obj Immutable object to be used instead of the current
-   *                      state's attr.
-   * @return {string} serial { name: '<field name>', value: '<value>' }
-   */
-  serialize(obj) {
-    let attrs = obj || this.state.attrs;
-    let mutableAttrs = attrs.toJS();
-    return JSON.stringify({
-       name: mutableAttrs.name,
-       value: validation._isSupplied(mutableAttrs.value) ?
-         mutableAttrs.value :
-         null
-    });
-  }
-
-  /**
-   * All attributes for the field as an object.
-   *
-   * @param {boolean} immutable If true will return a immutable Map.
-   * @return {object} attrs
-   */
-  attrs(immutable) {
-    if (immutable) {
-      return this.state.attrs;
+    if (nextProps.value !== val) {
+      inputValue(this.context.formName, this.props.name, nextProps.value);
+      this.validate().catch(noop);
     }
-    return this.state.attrs.toJS();
   }
 
   /**
-   * Used to easily determine if there is a validation error or not.
+   * This is only called when the component is mounting. It adds some logic to
+   * determine which value to use as a default based on a props.
    *
-   * @return {boolean} error
+   * @return {mixed}
    */
-  hasError() {
-    return this.state.error instanceof ValidationError;
+  getInitialValue() {
+    if (this.props.defaultValue !== undefined) {
+      return this.props.defaultValue;
+    }
+
+    if (this.props.value !== undefined) {
+      return this.props.value;
+    }
+
+    return null;
   }
 
   /**
-   * Call this to update the attrs state. This will automatically set the
-   * serial and validate the value for errors. It's necessary that this gets
-   * called onChange with the updated value. This is also useful for setting
-   * default properties for a field in componentWillMount.
+   * Format the class name based on the error state.
    *
-   * Note that validate() is not called durning the initial render which assigns
-   * error to null. This essentially puts the field in a "idle" state.
+   * @return {string}
+   */
+  getClassName() {
+    if (this.state.error === null) {
+      return 'serial-form-input fresh';
+    } else if (this.state.error === false) {
+      return 'serial-form-input valid';
+    } else if (this.state.error) {
+      return 'serial-form-input invalid';
+    }
+    return '';
+  }
+
+  /**
+   * Update the value for the field. This should be called in the extending
+   * class whenever the calue should be updated.
    *
-   * this.updateAttrs({ value: 'foo', x: 1 }, { value: 'bar' }, onStateUpdate);
-   *  // => { value: 'bar', x: 1 }
-   *
-   * @param {...object} object Objects will be merged from right to left.
+   * @param {mixed} Any value.
    * @return {void}
    */
-  updateAttrs() {
-    let opts = [];
-    let updated = function() {};
-    let len = arguments.length;
+  updateValue(value) {
+    inputValue(this.context.formName, this.props.name, value);
+    this.validate().catch(noop);
+  }
 
-    for (let i = 0; i < len; i++) {
-      if (typeof arguments[i] === 'function') {
-        updated = arguments[i];
-      } else if (typeof arguments[i] === 'object') {
-        opts.push(arguments[i]);
-      }
-    }
+  /**
+   * Using the validators specified, this will validate the value.
+   *
+   * @return {object} Promise
+   */
+  validate() {
+    const formName = this.context.formName;
+    const inputName = this.props.name;
+    const opts = this.props.formopts;
+    const value = inputValue(formName, inputName);
 
-    opts.push({
-      onChange: this.onChange.bind(this)
-    });
-
-    this.setState(prev => {
-      let obj = {
-        attrs: prev.attrs.merge.apply(prev.attrs, opts)
+    return new Promise((resolve, reject) => {
+      const onValid = () => {
+        this.setState({
+          error: false
+        });
+        resolve();
       };
 
-      obj.attrs = obj.attrs.update('data-serial', v => this.serialize(obj.attrs));
+      const onInvalid = (validator) => {
+        let err;
+        let msg;
+        if (!validator === undefined || validator === null) {
+          msg = 'Invalid.';
+        } else if (typeof validator === 'string') {
+          msg = validator;
+        } else {
+          const name = validator.name;
+          const validatorMsg = validator.message;
 
-      if (this._hasMounted) {
-        this.validate(obj.attrs.toJS().value);
-      }
+          if (opts && opts.messages && opts.messages[name]) {
+            msg = opts.messages[name];
+          } else {
+            msg = validatorMsg;
+          }
+        }
 
-      return obj;
-    }, updated);
+        err = new ValidationError(msg);
+
+        this.setState({
+          error: err
+        });
+
+        return err;
+      };
+
+      const checks = this.validators.map((v) => {
+        return new Promise((_resolve, _reject) => {
+          const __reject = (passedErr) => {
+            const err = onInvalid(passedErr ? passedErr : v);
+            _reject(err);
+            reject(err);
+          };
+          v.determine(value, _resolve, __reject);
+        });
+      });
+
+      Promise.all(checks).then(onValid).catch(noop);
+    });
   }
 
   /**
    * This method must be called when the field as changed. It must get the value
    * and set a value.
    *
-   * It's also important that this.ogOnChange gets called so if there was an
-   * actual onChange on the input, it will still get called.
-   *
    * @param {object} event
    * @return {void}
    */
   onChange(event) {
-    const val = event.target.value;
-    event.persist();
-    this.updateAttrs({
-      value: val
-    }, this.ogOnChange.bind(this, event));
-  }
-
-  /**
-   * If a onChange was applied on the field it will still get called here.
-   *
-   * @param {object} event The SyntheticEvent.
-   * @return {void}
-   */
-  ogOnChange(event) {
-    if (this._onChange) {
-      this._onChange(event);
-    }
-  }
-
-  /**
-   * Using the validators specified, this will validate the value.
-   *
-   * @param {?value} value If not set, the state value will be used.
-   * @return {mixed} null if valid but not supplied, ValidationError if invalid,
-   *                 false if supplied and valid.
-   */
-  validate(value) {
-    return new Promise((resolve, reject) => {
-      let val = value !== null ? value : this.attrs(true).get('value');
-      let msg;
-
-      const vs = this.validators.map((validator) => validator.invalid(val));
-
-      Promise.all(vs).then((isInvalid) => {
-        let i = 0;
-        let len = isInvalid.length;
-
-        for (; i < len; i++) {
-          if (isInvalid[i]) {
-            if (this.props.messages && this.props.messages[this.validators[i].name]) {
-              msg = this.props.messages[this.validators[i].name];
-            } else {
-              msg = this.validators[i].message;
-            }
-            return reject(new ValidationError(msg));
-          }
-        }
-      });
-
-      if (!validation._isSupplied(val)) {
-        return resolve(null);
-      }
-
-      return resolve(false);
-    });
+    throw new Error('Must implement.');
   }
 
   /**
    * Must be implemented.
    */
   render() {
-    throw new Error('This class should not be implemented directly.');
+    throw new Error('Must implement.');
   }
 }
 
@@ -293,5 +244,17 @@ InputBase.defaultProps = {};
  * @type {object}
  */
 InputBase.propTypes = {
-  name: React.PropTypes.string.isRequired
+  name: React.PropTypes.string.isRequired,
+  className: React.PropTypes.string,
+  onChange: React.PropTypes.func
+};
+
+/**
+ * Context types.
+ *
+ * @static
+ * @type {object}
+ */
+InputBase.contextTypes = {
+  formName: React.PropTypes.string.isRequired
 };

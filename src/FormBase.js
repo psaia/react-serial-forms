@@ -10,8 +10,7 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Qs from 'qs';
-import _ from 'lodash';
+import { registerForm, serializeForm, destroyForm, validateForm } from './state';
 
 /**
  * Base form class. Responsible for wrapping the fields in a <form> tag and
@@ -31,76 +30,48 @@ import _ from 'lodash';
 export default class FormBase extends React.Component {
 
   /**
-   * Form constructor.
+   * Form constructor. Here we set a unqiue random string to be the identifier
+   * for the initiated form. A weak random string should be good enough for us.
    *
    * @constructs Form
    */
   constructor(props) {
     super(props);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.__NAME__ = Math.random().toString(36).substring(7);
   }
 
   /**
-   * Render is only to be overwritten.
-   * @throws {Error}
+   * Register the form within the state before it mounts.
    */
-  render() {
-    throw new Error('This class should not be implemented directly.');
+  componentWillMount() {
+    registerForm(this.__NAME__);
   }
 
   /**
-   * A basic example for an onSubmit callback. You will definitely want to
-   * create your own so you can actually do something with the data.
-   *
-   * @param {object} SyntheticEvent
-   * @return {void}
+   * Remove form from memory on unmount.
    */
-  onSubmit(event) {
-    this.validate((valid) => {
-      if (valid) {
-        // Do things with serialization.
-      }
-    });
-    event.preventDefault();
+  componentWillUnmount() {
+    destroyForm(this.__NAME__);
   }
 
   /**
-   * Force all fields to validate. This should be called onSubmit. It will force
-   * all fields to validate.
+   * Grab the context which will be used to pass inputs information.
    *
-   * To trigger the validation on the child elements we dispatch a custom event
-   * called "validate" on the raw DOM elements. Upon mounting, all fields are
-   * setup to listen to this event.
-   *
-   * Lastly, we do a dirty async check to see if any of the inputs have a
-   * validation error based on their class name. A few milliseconds for slower
-   * browsers...
-   *
-   * @param {function} fn(valid){}
-   * @return {void} true
+   * @return {object}
    */
-  validate(fn) {
-    const node = ReactDOM.findDOMNode(this);
-    let len = node.elements.length;
-    let i = 0;
-    let valid = true;
-    let event = document.createEvent('Event');
-    event.initEvent('validate', true, true);
+  getChildContext() {
+    return {
+      formName: this.__NAME__
+    };
+  }
 
-    function trigger() {
-      node.elements[i].dispatchEvent(event);
-      setTimeout(() => {
-        if (valid && /error/.test(node.elements[i].getAttribute('class'))) {
-          valid = false;
-        }
-        if (i + 1 === len && fn) {
-          fn(valid);
-        } else {
-          trigger(++i);
-        }
-      }, 2);
-    }
-    trigger();
+  /**
+   * Causes all fields in the form to validate.
+   *
+   * @return {object} Returns a promise.
+   */
+  validate() {
+    return validateForm(this.__NAME__);
   }
 
   /**
@@ -110,50 +81,26 @@ export default class FormBase extends React.Component {
    * @return {array} collection
    */
   serialize() {
-    const node = ReactDOM.findDOMNode(this);
-    const CACHE_KEY = '___CACHE___';
-    const NUMBER_LIKE = /^\d*(?:\.{1}\d+)?$/;
-    let valCache = {};
-    let data;
-    let queryStr = '';
-    let json;
-    let val;
-    let len = node.elements.length;
+    return serializeForm(this.__NAME__);
+  }
 
-    // This will iterate through the form object that Qs creates and de-cache
-    // each value.
-    function mutateValues(obj) {
-      _.forEach(obj, function(v, k) {
-        if (_.isObject(v) || _.isArray(v)) {
-          return mutateValues(v);
-        } else {
-          obj[k] = valCache[v];
-        }
-      });
-    }
+  /**
+   * Render is only to be overwritten.
+   *
+   * @throws {Error}
+   */
+  render() {
+    throw new Error('Must implement.');
+  }
 
-    // Iterate through each element in the DOM and determine how to store the
-    // value in the element cache object. For example, a file type is a special
-    // type of input that shouldn't be serialized.
-    for (let i = 0; i < len; i++) {
-      if (typeof node.elements[i].getAttribute('data-serial') === 'string') {
-        json = JSON.parse(node.elements[i].getAttribute('data-serial'));
-        val = CACHE_KEY + i;
-        if (node.elements[i].type === 'file' && node.elements[i].value) {
-          valCache[val] = node.elements[i].files;
-        } else {
-          valCache[val] = json.value;
-        }
-        queryStr = queryStr + '&' + json.name + '=' + encodeURIComponent(val);
-      }
-    }
-    data = Qs.parse(queryStr, {
-      depth: Infinity,
-      parameterLimit: Infinity,
-      arrayLimit: Infinity
-    });
-    mutateValues(data);
-    return data;
+  /**
+   * onSubmit is only to be overwritten.
+   *
+   * @param {object} SyntheticEvent
+   * @return {void}
+   */
+  onSubmit(event) {
+    throw new Error('Must implement.');
   }
 }
 
@@ -173,4 +120,11 @@ FormBase.propTypes = {
   method: React.PropTypes.string.isRequired,
   submitText: React.PropTypes.string.isRequired,
   isLoading: React.PropTypes.bool.isRequired
+};
+
+/**
+ * Define context types.
+ */
+FormBase.childContextTypes = {
+  formName: React.PropTypes.string.isRequired
 };

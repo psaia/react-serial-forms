@@ -1,5 +1,6 @@
 import React from 'react';
 import InputBase from '../InputBase';
+import { assign } from 'lodash';
 
 export default class InputField extends InputBase {
 
@@ -11,35 +12,51 @@ export default class InputField extends InputBase {
   }
 
   /**
-   * Setup default attributes for component.
+   * Special behavior for radio buttons.
    *
    * @return {void}
    */
-  componentWillMount() {
-    super.componentWillMount();
-    this.updateAttrs(
-      {
-        type: 'text'
-      },
-      this.props
-    );
+  getInitialValue() {
+    if (this.props.type === 'radio') {
+      if (this.props.checked) {
+        return this.props.value;
+      } else {
+        return null;
+      }
+    }
+    return super.getInitialValue();
   }
 
   /**
-   * We need special detection for certain types of inputs.
+   * Special behavior for radio buttons.
    *
-   * Note: File inputs are special types of objects which are handled during
-   * form serialization.
+   * @return {void}
+   */
+  componentWillReceiveProps(nextProps) {
+    if (this.props.type === 'radio') {
+      if (this.props.checked) {
+        return super.componentWillReceiveProps(nextProps);
+      } else {
+        return null;
+      }
+    }
+
+    super.componentWillReceiveProps(nextProps);
+  }
+
+  /**
+   * Special behavior for various types.
    *
    * @param {object} event
    * @return {void}
    */
   onChange(event) {
-    let val;
+    let val = null;
     const elType = event.nativeEvent.target.type;
+
     switch (elType) {
       case 'checkbox':
-        val = event.target.checked ? 'on' : 'off';
+        val = event.target.checked ? 1 : 0;
         break;
       case 'number':
         val = parseFloat(event.target.value);
@@ -50,40 +67,47 @@ export default class InputField extends InputBase {
       case 'radio':
         if (event.target.checked) {
           val = event.target.value;
-        } else {
-          val = null;
+        }
+        break;
+      case 'file':
+        if (event.target.value) {
+          val = event.target;
         }
         break;
       default:
-        return super.onChange(event);
+        val = event.target.value;
     }
-    this.updateAttrs({
-      value: val
-    }, this.ogOnChange.bind(this, event));
+
+    this.updateValue(val);
+
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(event);
+    }
   }
 
   /**
-   * Create the DOM element. Here is a good place to add classes based on the
-   * current state and apply the attrs() to the field.
-   *
    * @return {object} ReactElement
    */
   render() {
-    let attrs = this.attrs();
     let errMessage = <span />;
+    const attrs = assign({}, this.props, {
+      onChange: this.onChange.bind(this)
+    });
 
-    if (this.state.error === null) {
-      attrs.className += ' idle';
-    } else if (this.state.error === false) {
-      attrs.className += ' success';
-    } else if (this.hasError()) {
-      attrs.className += ' error';
+    if (attrs.className) {
+      attrs.className += ` ${this.getClassName()}`;
+    } else {
+      attrs.className = this.getClassName();
+    }
+
+    if (this.state.error) {
       errMessage = (
         <span className='err-msg'>
           {this.state.error.message}
         </span>
       );
     }
+
     return (
       <span className='serial-input-wrapper'>
         <input {...attrs} />

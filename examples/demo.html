@@ -23,7 +23,8 @@ select, input, textarea {
   font-family: 'Lato', sans-serif;
   outline: 0;
 }
-input.error { border: 1px solid red; }
+input.invalid { border: 1px solid red; }
+input.valid { border: 1px solid blue; }
 .err-msg { color: red; }
 .inline input { display: inline; margin: 0 10px; }
 
@@ -46,7 +47,7 @@ input[type="email"] {
   <div id='demo'></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.7.3/immutable.min.js"></script>
-  <script src="https://fb.me/react-with-addons-0.14.3.min.js"></script>
+  <script src="https://fb.me/react-with-addons-0.14.3.js"></script>
   <script src="https://fb.me/react-dom-0.14.3.min.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
   <script src="../browser/react-serial-forms.js"></script>
@@ -68,51 +69,63 @@ input[type="email"] {
       },
       onSubmit: function(event) {
         var self = this;
-        this.refs.myForm.validate(function(valid) {
-          if (valid) {
-            self.setState({
-              serialization: self.refs.myForm.serialize()
-            });
-          }
-        });
-        event.preventDefault();
-      },
-      updateSerialization: function() {
-        var self = this;
-        setTimeout(function() {
+        this.refs.myForm.validate().then(function() {
           self.setState({
             serialization: self.refs.myForm.serialize()
           });
-        }, 0);
+        });
+        event.preventDefault();
+      },
+      validate: function() {
+        this.refs.myForm.validate().then(function() {
+          console.log('Everything is valid.');
+          alert('Everything is valid!');
+        }).catch(function(err) {
+          alert(err.message);
+          console.log('Validation error: ', err);
+        });
+      },
+      serialization: function() {
+        if (this.refs.myForm) {
+          return this.refs.myForm.serialize();
+        }
+        return {};
       },
       undo: function() {
         var self = this;
+        var update = function() {
+          self.forceUpdate();
+        };
         this.setState(function(prev) {
           return {
             undoCache: prev.undoCache.pop(),
             addedPeople: prev.undoCache.last()
           }
-        }, self.updateSerialization);
+        }, update);
       },
       addNewPerson: function() {
+        var self = this;
         var personIndex = this.state.addedPeople.size;
         var personKey = 'people[' + personIndex + ']';
         var moods = [
           { text: 'Happy' , value: 'happy' },
           { text: 'Aloof' , value: 'aloof' }
         ];
+        var update = function() {
+          self.forceUpdate();
+        };
         var person = (
           <div key={personIndex} className='person'>
             <p>
               <InputField
-                onChange={this.updateSerialization}
+                onChange={update}
                 name={personKey + '[full_name]'}
                 placeholder='Full Name'
                 validation='required' />
             </p>
             <p>
               <SelectField
-                onChange={this.updateSerialization}
+                onChange={update}
                 options={moods}
                 value='happy'
                 name={personKey + '[mood]'}
@@ -125,9 +138,11 @@ input[type="email"] {
             undoCache: prev.undoCache.push(this.state.addedPeople),
             addedPeople: prev.addedPeople.push(person)
           };
-        });
+        }, update);
       },
       render: function() {
+        var self = this;
+        var serialization = JSON.stringify(this.serialization(), null, 2);
         var fruitChoices = [
           { text: '- Select Fruit -', value: '' },
           { text: 'Apple', value: 'apple' },
@@ -139,9 +154,10 @@ input[type="email"] {
           { text: 'Avocado', value: 'avocado' }
         ];
         var attrs = {
-          onChange: this.updateSerialization
+          onChange: function() {
+            self.forceUpdate();
+          }
         };
-        var serialization = JSON.stringify(this.state.serialization, null, 2);
         return (
           <BasicForm ref='myForm' onKeyUp={this.onChange} onSubmit={this.onSubmit}>
             <div className='some-test-fields'>
@@ -160,7 +176,7 @@ input[type="email"] {
                   {...attrs}
                   id='first_name'
                   placeholder='John'
-                  name='First Name'
+                  name='first_name'
                   validation='required' />
               </p>
               <p>
@@ -169,7 +185,7 @@ input[type="email"] {
                   {...attrs}
                   placeholder='Doe'
                   id='last_name'
-                  name='Last Name'
+                  name='last_name'
                   validation='required'/>
               </p>
               <p>
@@ -188,7 +204,7 @@ input[type="email"] {
                   {...attrs}
                   options={fruitChoices}
                   id='fruit'
-                  name='Fruit'
+                  name='fruit'
                   validation='required'/>
               </p>
               <p>
@@ -268,6 +284,9 @@ input[type="email"] {
                   {...attrs}
                   type='file'
                   name='uploaded-file'/>
+              </p>
+              <p>
+                <button onClick={this.onSubmit}>Submit</button>
               </p>
             </div>
             <div className='serialization'>
