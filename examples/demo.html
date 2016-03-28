@@ -69,21 +69,17 @@ input[type="email"] {
       },
       onSubmit: function(event) {
         var self = this;
-        this.refs.myForm.validate().then(function() {
-          self.setState({
-            serialization: self.refs.myForm.serialize()
-          });
-        });
+        this.refs.myForm.validate()
+          .then(function() {
+            console.log('Everything is valid.');
+            alert('Everything is valid!');
+          })
+          .catch(function(err) {
+            alert(err.message);
+            console.log('Validation error: ', err);
+          })
+        ;
         event.preventDefault();
-      },
-      validate: function() {
-        this.refs.myForm.validate().then(function() {
-          console.log('Everything is valid.');
-          alert('Everything is valid!');
-        }).catch(function(err) {
-          alert(err.message);
-          console.log('Validation error: ', err);
-        });
       },
       serialization: function() {
         if (this.refs.myForm) {

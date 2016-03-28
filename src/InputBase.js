@@ -11,7 +11,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Map } from 'immutable';
-import { assign, noop } from 'lodash';
+import { assign, noop, defer } from 'lodash';
 import { registerInput, inputValue, destroyInput } from './state';
 import ValidationError from './ValidationError';
 import validation from './validation';
@@ -159,55 +159,44 @@ export default class InputBase extends React.Component {
     const inputName = this.props.name;
     const opts = this.props.formopts;
     const value = inputValue(formName, inputName);
+    const createError = (validator) => {
+      let err;
+      let msg;
+      if (!validator === undefined || validator === null) {
+        msg = 'Invalid.';
+      } else if (typeof validator === 'string') {
+        msg = validator;
+      } else {
+        const name = validator.name;
+        const validatorMsg = validator.message;
 
-    return new Promise((resolve, reject) => {
-      const onValid = () => {
-        this.setState({
-          error: false
-        });
-        resolve();
-      };
-
-      const onInvalid = (validator) => {
-        let err;
-        let msg;
-        if (!validator === undefined || validator === null) {
-          msg = 'Invalid.';
-        } else if (typeof validator === 'string') {
-          msg = validator;
+        if (opts && opts.messages && opts.messages[name]) {
+          msg = opts.messages[name];
         } else {
-          const name = validator.name;
-          const validatorMsg = validator.message;
-
-          if (opts && opts.messages && opts.messages[name]) {
-            msg = opts.messages[name];
-          } else {
-            msg = validatorMsg;
-          }
+          msg = validatorMsg;
         }
+      }
 
-        err = new ValidationError(msg);
+      err = new ValidationError(msg);
+      return err;
+    };
 
-        this.setState({
-          error: err
-        });
-
-        return err;
-      };
-
-      const checks = this.validators.map((v) => {
+    return Promise.all(
+      this.validators.map((v) => {
         return new Promise((_resolve, _reject) => {
           const __reject = (passedErr) => {
-            const err = onInvalid(passedErr ? passedErr : v);
+            const err = createError(passedErr ? passedErr : v);
+            this.setState({ error: err });
             _reject(err);
-            reject(err);
           };
-          v.determine(value, _resolve, __reject);
+          const __resolve = () => {
+            this.setState({ error: false });
+            _resolve();
+          };
+          defer(() => v.determine(value, __resolve, __reject));
         });
-      });
-
-      Promise.all(checks).then(onValid).catch(noop);
-    });
+      })
+    );
   }
 
   /**

@@ -9,8 +9,7 @@
  * @module validation
  */
 import { Map } from 'immutable';
-import { isObject, isArray, forEach, filter, map } from 'lodash';
-import Qs from 'qs';
+import { isObject, isArray, forEach, filter, map, noop } from 'lodash';
 import qs from './qs';
 
 let state = new Map();
@@ -62,7 +61,11 @@ export const inputValue = function(formName, inputName, value) {
 };
 
 export const validateForm = function(formName) {
-  return Promise.all(map(forms[formName], f => f.validate()));
+  return new Promise((resolve, reject) => {
+    Promise.all(map(forms[formName], f => f.validate()))
+      .then(resolve)
+      .catch(reject);
+  });
 };
 
 export const serializeForm = function(formName) {
