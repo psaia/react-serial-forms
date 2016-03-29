@@ -10,12 +10,9 @@
  */
 export default class ValidationError extends Error {
   constructor(message) {
-    super();
-    Object.defineProperty(this, 'message', {
-      value: message
-    });
-  }
-  get name() {
-    return 'ValidationError';
+    super(message);
+    this.message = message;
+    this.stack = (new Error()).stack;
+    this.name = this.constructor.name;
   }
 }

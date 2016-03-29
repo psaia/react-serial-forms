@@ -23,7 +23,8 @@ select, input, textarea {
   font-family: 'Lato', sans-serif;
   outline: 0;
 }
-input.error { border: 1px solid red; }
+input.invalid { border: 1px solid red; }
+input.valid { border: 1px solid blue; }
 .err-msg { color: red; }
 .inline input { display: inline; margin: 0 10px; }
 
@@ -46,8 +47,8 @@ input[type="email"] {
   <div id='demo'></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.7.3/immutable.min.js"></script>
-  <script src="https://fb.me/react-0.13.3.min.js"></script>
-  <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+  <script src="https://fb.me/react-with-addons-0.14.3.js"></script>
+  <script src="https://fb.me/react-dom-0.14.3.min.js"></script>
   <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
   <script src="../browser/react-serial-forms.js"></script>
 
@@ -57,6 +58,35 @@ input[type="email"] {
     var InputField = SerialForms.InputField;
     var SelectField = SerialForms.SelectField;
     var TextareaField = SerialForms.TextareaField;
+    var validation = SerialForms.validation;
+
+    // Fake a ajax request.
+    var fakeUserNameCheck = (function() {
+      var t;
+      return function(str, cb) {
+        clearTimeout(t);
+        t = setTimeout(function() {
+          if (str && /^p/i.test(str)) {
+            return cb({ ok: 0 });
+          }
+          return cb({ ok: 1 });
+        }, 1200);
+      };
+    })();
+
+    // Register a validator to check the username.
+    validation.registerValidator({
+      name: 'unique_username',
+      determine: function(value, pass, fail) {
+        fakeUserNameCheck(value, function(res) {
+          if (res.ok) {
+            return pass();
+          }
+          return fail();
+        });
+      },
+      message: 'Username is not unique.'
+    });
 
     var DemoForm = React.createClass({
       getInitialState: function() {
@@ -68,51 +98,57 @@ input[type="email"] {
       },
       onSubmit: function(event) {
         var self = this;
-        this.refs.myForm.validate(function(valid) {
-          if (valid) {
-            self.setState({
-              serialization: self.refs.myForm.serialize()
-            });
-          }
-        });
+        this.refs.myForm.validate()
+          .then(function() {
+            alert('Everything is valid!');
+          })
+          .catch(function(err) {
+            alert(err.message);
+          })
+        ;
         event.preventDefault();
       },
-      updateSerialization: function() {
-        var self = this;
-        setTimeout(function() {
-          self.setState({
-            serialization: self.refs.myForm.serialize()
-          });
-        }, 0);
+      serialization: function() {
+        if (this.refs.myForm) {
+          return this.refs.myForm.serialize();
+        }
+        return {};
       },
       undo: function() {
         var self = this;
+        var update = function() {
+          self.forceUpdate();
+        };
         this.setState(function(prev) {
           return {
             undoCache: prev.undoCache.pop(),
             addedPeople: prev.undoCache.last()
           }
-        }, self.updateSerialization);
+        }, update);
       },
       addNewPerson: function() {
+        var self = this;
         var personIndex = this.state.addedPeople.size;
         var personKey = 'people[' + personIndex + ']';
         var moods = [
           { text: 'Happy' , value: 'happy' },
           { text: 'Aloof' , value: 'aloof' }
         ];
+        var update = function() {
+          self.forceUpdate();
+        };
         var person = (
           <div key={personIndex} className='person'>
             <p>
               <InputField
-                onChange={this.updateSerialization}
+                onChange={update}
                 name={personKey + '[full_name]'}
                 placeholder='Full Name'
                 validation='required' />
             </p>
             <p>
               <SelectField
-                onChange={this.updateSerialization}
+                onChange={update}
                 options={moods}
                 value='happy'
                 name={personKey + '[mood]'}
@@ -125,9 +161,11 @@ input[type="email"] {
             undoCache: prev.undoCache.push(this.state.addedPeople),
             addedPeople: prev.addedPeople.push(person)
           };
-        });
+        }, update);
       },
       render: function() {
+        var self = this;
+        var serialization = JSON.stringify(this.serialization(), null, 2);
         var fruitChoices = [
           { text: '- Select Fruit -', value: '' },
           { text: 'Apple', value: 'apple' },
@@ -139,9 +177,10 @@ input[type="email"] {
           { text: 'Avocado', value: 'avocado' }
         ];
         var attrs = {
-          onChange: this.updateSerialization
+          onChange: function() {
+            self.forceUpdate();
+          }
         };
-        var serialization = JSON.stringify(this.state.serialization, null, 2);
         return (
           <BasicForm ref='myForm' onKeyUp={this.onChange} onSubmit={this.onSubmit}>
             <div className='some-test-fields'>
@@ -159,21 +198,32 @@ input[type="email"] {
                 <InputField
                   {...attrs}
                   id='first_name'
+                  type='text'
                   placeholder='John'
-                  name='First Name'
+                  name='first_name'
                   validation='required' />
               </p>
               <p>
                 <label htmlFor='last_name'>Last Name*</label>
                 <InputField
                   {...attrs}
+                  type='text'
                   placeholder='Doe'
                   id='last_name'
-                  name='Last Name'
+                  name='last_name'
                   validation='required'/>
               </p>
               <p>
-                <label htmlFor='last_name'>Age</label>
+                <label htmlFor='last_name'>Username*</label>
+                <InputField
+                  {...attrs}
+                  type='text'
+                  placeholder='Any word starting with "p" is taken.'
+                  name='username'
+                  validation='required,unique_username'/>
+              </p>
+              <p>
+                <label htmlFor='age'>Age</label>
                 <InputField
                   {...attrs}
                   placeholder='22'
@@ -187,8 +237,9 @@ input[type="email"] {
                 <SelectField
                   {...attrs}
                   options={fruitChoices}
+                  type='text'
                   id='fruit'
-                  name='Fruit'
+                  name='fruit'
                   validation='required'/>
               </p>
               <p>
@@ -269,6 +320,9 @@ input[type="email"] {
                   type='file'
                   name='uploaded-file'/>
               </p>
+              <p>
+                <button onClick={this.onSubmit}>Submit</button>
+              </p>
             </div>
             <div className='serialization'>
               <pre>
@@ -279,7 +333,7 @@ input[type="email"] {
         );
       }
     });
-    React.render(<DemoForm />, document.getElementById('demo'));
+    ReactDOM.render(<DemoForm />, document.getElementById('demo'));
   })();
   </script>
 </body>

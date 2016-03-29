@@ -6,22 +6,12 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
-import ValidationError from './ValidationError';
-import validation from './validation';
-import InputBase from './InputBase';
-import FormBase from './FormBase';
-import InputField from './fields/InputField';
-import TextareaField from './fields/TextareaField';
-import SelectField from './fields/SelectField';
-import BasicForm from './forms/BasicForm';
-
-export default {
-  ValidationError,
-  validation,
-  FormBase,
-  InputBase,
-  InputField,
-  TextareaField,
-  SelectField,
-  BasicForm
-};
+export {default as ValidationError} from './ValidationError';
+export {default as validation} from './validation';
+export {default as state} from './state';
+export {default as InputBase} from './InputBase';
+export {default as FormBase} from './FormBase';
+export {default as InputField} from './fields/InputField';
+export {default as TextareaField} from './fields/TextareaField';
+export {default as SelectField} from './fields/SelectField';
+export {default as BasicForm} from './forms/BasicForm';

@@ -1,5 +1,6 @@
 import React from 'react';
 import InputBase from '../InputBase';
+import { assign } from 'lodash';
 
 export default class SelectField extends InputBase {
   /**
@@ -9,19 +10,10 @@ export default class SelectField extends InputBase {
     super(props);
   }
 
-  /**
-   * The only special attribute select boxes will need is `options`.
-   *
-   * @return {void}
-   */
-  componentWillMount() {
-    super.componentWillMount();
-    this.updateAttrs(
-      {
-        options: []
-      },
-      this.props
-    );
+  originalOnChange(event) {
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(event);
+    }
   }
 
   /**
@@ -32,19 +24,23 @@ export default class SelectField extends InputBase {
    */
   onChange(event) {
     if (!event.target.multiple) {
-      return super.onChange(event);
+      this.updateValue(event.target.value);
+      this.originalOnChange(event);
+      return;
     }
+
     let options = event.target.options;
     let val = [];
     let len = options.length;
+
     for (let i = 0; i < len; i++) {
       if (options[i].selected) {
         val.push(options[i].value);
       }
     }
-    this.updateAttrs({
-      value: val
-    }, this.ogOnChange.bind(this, event));
+
+    this.updateValue(val);
+    this.originalOnChange(event);
   }
 
   /**
@@ -53,15 +49,19 @@ export default class SelectField extends InputBase {
    * @return {object} ReactElement
    */
   render() {
-    let attrs = this.attrs();
     let errMessage = <span />;
 
-    if (this.state.error === null) {
-      attrs.className += ' idle';
-    } else if (this.state.error === false) {
-      attrs.className += ' success';
-    } else if (this.hasError()) {
-      attrs.className += ' error';
+    const attrs = assign({}, this.props, {
+      onChange: this.onChange.bind(this)
+    });
+
+    if (attrs.className) {
+      attrs.className += ` ${this.getClassName()}`;
+    } else {
+      attrs.className = this.getClassName();
+    }
+
+    if (this.state.error) {
       errMessage = (
         <span className='err-msg'>
           {this.state.error.message}
