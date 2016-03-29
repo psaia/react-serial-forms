@@ -110,6 +110,9 @@ const _getInputValueAndEvent = function(formName, inputName) {
     return { form };
   } else {
     const inputValue = form.get(inputName);
-    return { form, inputValue };
+    return {
+      form,
+      inputValue
+    };
   }
 };

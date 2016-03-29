@@ -24,6 +24,7 @@ Serial Forms aims to accomplish the following goals:
 * Built with performance and compatibility in mind and well tested.
 * Source code must be as good as any documentation.
 
+
 # Example
 
 **[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**
@@ -59,15 +60,15 @@ import {
 Include one of the files (minified or non-minfied) in the dist/ directory of the
 npm installed module.
 
-# Usage
+# The birds and the bees
 
 There are 3 fundamental aspects to Serial Forms:
 
-1. Validation - On field change check value for validity.
-2. Serialization - Serial Forms allows you to be expressive with creating forms
+1. **Validation.** On field change async check value for validity.
+2. **Serialization.** Serial Forms allows you to be expressive with creating forms
 by giving you the ability to specify how the data is formatted by the naming
 conventions of the `name` attribute.
-3. Freedom. You should not be restricted by using premade columns or rows. Just
+3. **Freedom.** You should not be restricted by using premade columns or rows. Just
 build the form the way you want with whatever frontend technology you want.
 
 Without extending Serial Forms, the fields are very basic.
@@ -79,6 +80,9 @@ Without extending Serial Forms, the fields are very basic.
 These components except all of the attributes the native (react) components
 would, with the addition of a `validation` and `messages` attribute which
 allows you to specify how the field should validate.
+
+The only real requirement is that a Input component must be inside a Form
+component.
 
 ## States of an input
 
@@ -127,19 +131,26 @@ let messages = {
 
 ##### Custom Validators
 
-Creating a custom validator is simple. [Validators are synchronous at the
-moment](https://github.com/LevInteractive/react-serial-forms/issues/10). They must be defined sometime before the component is mounted.
+Validators are 100% asynchronous as of v2.0!
 
 ```javascript
+import { validation } from 'react-serial-forms';
+
 validation.registerValidator({
-  name: 'largerThanFive',
-  invalid: function(value) {
-    return value < 5;
+  name: 'unique_username',
+  determine: function(value, pass, fail) {
+    someAsyncRequest((res) = {
+      if (res.ok) {
+        pass();
+      } else {
+        fail();
+      }
+    });
   },
-  message: 'The field should be larger than 5.'
+  message: 'Username is taken.'
 });
 
-<InputField type='number' validation='largerThanFive' name='full_name' />
+<InputField type='text' validation='unique_username' name='username' />
 ```
 
 ## Serialization
@@ -149,7 +160,7 @@ easily create complex data structures in components without much post-submit
 processing. Thus, saving you tons of time.
 
 * `name="my-title"` = `{ "my-title": "<value>" }`
-* `name="fruits[]"` = `{ "fruits": ["<value>", "<value>", ...] }`
+* `name="fruits[n]"` = `{ "fruits": ["<value>", "<value>", ...] }`
 * `name="fruits[0][name]"` = `{ "fruits": [{"name": "<value>"}] }`
 * And so on. You can nest arrays and objects infinitely.
 
@@ -158,11 +169,13 @@ You will more than likely want to obtain the serialized object `onSubmit`.
 ```javascript
 onSubmit(e) {
   let theform = this.refs.myform; // Grab from the refs.
-  theform.validate((valid) => {   // You may want to force validation.
-    if (valid) {
+  theform.validate
+    .then(() => {   // You may want to force validation.
       console.log(theform.serialize()); // Save to a store or something.
-    }
-  });
+    })
+    .catch(() => {
+      // Do something if there is an error.
+    });
 }
 ```
 
@@ -266,13 +279,6 @@ const form = (
   <BasicForm>
     <InputField name='title' validation='required' />
 
-    <div className='simpleList'>
-      <InputField value='apple' name='fruits[]' />
-      <InputField value='orange' name='fruits[]' />
-      <InputField value='strawberry' name='fruits[]' />
-      <InputField value='grapefruit' name='fruits[]' />
-    </div>
-
     <div className='simpleList-numbered'>
       <InputField value='garlic' name='veges[0]' />
       <InputField value='pepper' name='veges[3]' />
@@ -328,12 +334,6 @@ Would automatically create a serialized object like this:
 ```json
 {
   "title": "My Title",
-  "fruits": [
-    "apple",
-    "orange",
-    "strawberry",
-    "grapefruit"
-  ],
   "veges": [
     "garlic",
     "carrot",

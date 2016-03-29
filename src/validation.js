@@ -69,34 +69,34 @@ const validation = new Validation();
 
 validation.registerValidator({
   name: 'required',
-  determine: function(value, resolve, reject) {
+  determine: function(value, pass, fail) {
     if (_isSupplied(value)) {
-      return resolve();
+      return pass();
     }
-    reject();
+    fail();
   },
   message: 'This field is required.'
 });
 
 validation.registerValidator({
   name: 'email',
-  determine: function(value, resolve, reject) {
+  determine: function(value, pass, fail) {
     const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     if (_isSupplied(value) && !EMAIL_PATTERN.test(value)) {
-      return reject();
+      return fail();
     }
-    resolve();
+    pass();
   },
   message: 'Email is invalid.'
 });
 
 validation.registerValidator({
   name: 'numeral',
-  determine: function(value, resolve, reject) {
+  determine: function(value, pass, fail) {
     if (_isSupplied(value) && !/^[0-9.]+$/.test(value)) {
-      return reject();
+      return fail();
     }
-    resolve();
+    pass();
   },
   message: 'Must be a number.'
 });
