@@ -24,7 +24,6 @@ gulp.task('bundle', ['clean-browser'], function() {
     return browserify({
       entries: ['./src/index.js'],
       transform: [
-        'browserify-shim',
         [
           'babelify', {
             "presets": [
@@ -38,6 +37,7 @@ gulp.task('bundle', ['clean-browser'], function() {
       standalone: 'SerialForms',
       debug: true
     })
+    .transform('browserify-shim')
     .bundle();
   };
 

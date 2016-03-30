@@ -1,7 +1,7 @@
 # Serial Forms
 
 This library is a light abstraction over
-[React forms](https://facebook.github.io/react/docs/forms.html) that allows for
+[React forms](https://facebook.github.io/react/docs/forms.html) (85k minified) that allows for
 customizable layouts for various types of data schemas. Serial Forms decouples
 the input itself from the data it generates by creating a serialized object
 that represents the input's value which may or may not be on the input itself.
