@@ -98,14 +98,16 @@ input[type="email"] {
       },
       onSubmit: function(event) {
         var self = this;
-        this.refs.myForm.validate()
-          .then(function() {
-            alert('Everything is valid!');
-          })
-          .catch(function(err) {
-            alert(err.message);
-          })
-        ;
+        console.log('Submitted. Checking async errors.');
+        this.refs.myForm.validate(function(errs) {
+          if (errs) {
+            alert('There are ' + errs.length + ' errors.');
+            alert('Check out your console to see them.');
+            console.log(errs);
+            return;
+          }
+          alert('All passed! No errors.');
+        });
         event.preventDefault();
       },
       serialization: function() {
