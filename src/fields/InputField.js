@@ -28,23 +28,6 @@ export default class InputField extends InputBase {
   }
 
   /**
-   * Special behavior for radio buttons.
-   *
-   * @return {void}
-   */
-  componentWillReceiveProps(nextProps) {
-    if (this.props.type === 'radio') {
-      if (this.props.checked) {
-        return super.componentWillReceiveProps(nextProps);
-      } else {
-        return null;
-      }
-    }
-
-    super.componentWillReceiveProps(nextProps);
-  }
-
-  /**
    * Special behavior for various types.
    *
    * @param {object} event

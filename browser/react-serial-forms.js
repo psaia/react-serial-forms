@@ -15289,8 +15289,6 @@ var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _lodash = require('lodash');
 
-var _lodash2 = _interopRequireDefault(_lodash);
-
 var _state = require('./state');
 
 var _ValidationError = require('./ValidationError');
@@ -15416,30 +15414,14 @@ var InputBase = function (_React$Component) {
 
   }, {
     key: 'shouldComponentUpdate',
-    value: function shouldComponentUpdate(nextProps) {
+    value: function shouldComponentUpdate(nextProps, nextState) {
       var val = (0, _state.inputValue)(this.context.formName, this.props.name);
       var nextVal = nextProps.value ? nextProps.value : null;
-      if (nextVal !== val) {
+
+      if (this.state.error !== nextState.error || nextVal !== val) {
         return true;
       }
       return false;
-    }
-
-    /**
-     * If updating with a new value, update the state.
-     *
-     * @return {void}
-     */
-
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      var val = (0, _state.inputValue)(this.context.formName, this.props.name);
-
-      if (nextProps.value !== val) {
-        (0, _state.inputValue)(this.context.formName, this.props.name, nextProps.value);
-        this.validate();
-      }
     }
 
     /**
@@ -15541,13 +15523,13 @@ var InputBase = function (_React$Component) {
         var _v = _this3.validators[i++];
 
         var pass = function pass() {
-          _validate();
+          (0, _lodash.defer)(_validate);
         };
 
         var fail = function fail(passedErr) {
           var err = createError(passedErr ? passedErr : _v);
           errors.push(err);
-          _validate();
+          (0, _lodash.defer)(_validate);
         };
 
         if (_v) {
@@ -15555,15 +15537,23 @@ var InputBase = function (_React$Component) {
         }
 
         if (errors.length) {
-          _this3.setState({ error: errors[errors.length - 1] });
-          return onComplete(errors[errors.length - 1]);
+          return _this3.setState({
+            error: errors[errors.length - 1]
+          }, function () {
+            return onComplete(errors[errors.length - 1]);
+          });
         }
 
-        _this3.setState({ error: false });
-        onComplete(false);
+        _this3.setState({
+          error: false
+        }, function () {
+          return onComplete(false);
+        });
       };
 
-      _lodash2.default.defer(_validate);
+      this.setState({
+        error: false
+      }, _validate);
     }
 
     /**
@@ -15731,26 +15721,6 @@ var InputField = function (_InputBase) {
         }
       }
       return _get(Object.getPrototypeOf(InputField.prototype), 'getInitialValue', this).call(this);
-    }
-
-    /**
-     * Special behavior for radio buttons.
-     *
-     * @return {void}
-     */
-
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      if (this.props.type === 'radio') {
-        if (this.props.checked) {
-          return _get(Object.getPrototypeOf(InputField.prototype), 'componentWillReceiveProps', this).call(this, nextProps);
-        } else {
-          return null;
-        }
-      }
-
-      _get(Object.getPrototypeOf(InputField.prototype), 'componentWillReceiveProps', this).call(this, nextProps);
     }
 
     /**

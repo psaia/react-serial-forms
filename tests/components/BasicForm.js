@@ -111,12 +111,14 @@ describe('BasicForm', function() {
     })
 
     form2.validate((errs) => {
-      expect(errs.length).to.equal(1);
-      expect(errs[0].message).to.equal('foobar');
-      let DOMNode = ReactDOM.findDOMNode(form2);
-      let el = DOMNode.querySelector('input[name="last_name"]')
-      expect(isInvalid(el.getAttribute('class'))).to.be.true;
-      done();
+      setTimeout(() => {
+        expect(errs.length).to.equal(1);
+        expect(errs[0].message).to.equal('foobar');
+        let DOMNode = ReactDOM.findDOMNode(form2);
+        let el = DOMNode.querySelector('input[name="last_name"]')
+        expect(isInvalid(el.getAttribute('class'))).to.be.true;
+        done();
+      }, 10);
     });
   });
 

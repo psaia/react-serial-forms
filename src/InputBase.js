@@ -10,7 +10,6 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import _ from 'lodash';
 import { assign, noop, defer, forEach } from 'lodash';
 import { registerInput, inputValue, destroyInput } from './state';
 import ValidationError from './ValidationError';
@@ -93,27 +92,14 @@ export default class InputBase extends React.Component {
    *
    * @return {boolean}
    */
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     const val = inputValue(this.context.formName, this.props.name);
     const nextVal = nextProps.value ? nextProps.value : null;
-    if (nextVal !== val) {
+
+    if (this.state.error !== nextState.error || nextVal !== val) {
       return true;
     }
     return false;
-  }
-
-  /**
-   * If updating with a new value, update the state.
-   *
-   * @return {void}
-   */
-  componentWillReceiveProps(nextProps) {
-    const val = inputValue(this.context.formName, this.props.name);
-
-    if (nextProps.value !== val) {
-      inputValue(this.context.formName, this.props.name, nextProps.value);
-      this.validate();
-    }
   }
 
   /**
@@ -199,13 +185,13 @@ export default class InputBase extends React.Component {
       const _v = this.validators[i++];
 
       const pass = () => {
-        _validate();
+        defer(_validate);
       };
 
       const fail = (passedErr) => {
         const err = createError(passedErr ? passedErr : _v);
         errors.push(err);
-        _validate();
+        defer(_validate);
       };
 
       if (_v) {
@@ -213,15 +199,19 @@ export default class InputBase extends React.Component {
       }
 
       if (errors.length) {
-        this.setState({ error: errors[errors.length - 1] });
-        return onComplete(errors[errors.length - 1]);
+        return this.setState({
+          error: errors[errors.length - 1]
+        }, () => onComplete(errors[errors.length - 1]));
       }
 
-      this.setState({ error: false });
-      onComplete(false);
+      this.setState({
+        error: false
+      }, () => onComplete(false));
     }
 
-    _.defer(_validate);
+    this.setState({
+      error: false
+    }, _validate);
   }
 
   /**
