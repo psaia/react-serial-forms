@@ -31,13 +31,16 @@ export const registerInput = function(formName, inputName, initialValue, validat
 };
 
 export const destroyForm = function(formName) {
-  state[formName] = null;
-  delete state[formName];
+  if (state[formName]) {
+    state[formName] = null;
+    delete state[formName];
+  }
 };
 
 export const destroyInput = function(formName, inputName) {
   if (state[formName][inputName]) {
     state[formName][inputName].validate = null;
+    state[formName][inputName].value = null;
     delete state[formName][inputName];
   }
 };
@@ -91,7 +94,7 @@ export const serializeForm = function(formName) {
   forEach(form, (v, k) => {
     val = `${CACHE_KEY}${i++}`;
     valCache[val] = v.value === undefined ? null : v.value;
-    queryStr = queryStr + '&' + k + '=' + val;
+    queryStr = `${queryStr}&${k}=${val}`;
   });
 
   data = qs(queryStr);
