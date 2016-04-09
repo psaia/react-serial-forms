@@ -321,6 +321,7 @@ const form = (
 
       </div>
     </div>
+    <InputField name='submit' type='submit' value='Submit' />
   </BasicForm>
 );
 ```
