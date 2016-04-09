@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.2
+  * Added handy `attrs()` method which takes care of hard-setting a `value` prop on an input. ([fixes #22](https://github.com/LevInteractive/react-serial-forms/issues/22))
+
 ## v2.0.1
   * Remove componentWillReceiveProps()
   * Forced false error state on change.

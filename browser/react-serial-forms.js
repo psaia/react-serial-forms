@@ -15425,6 +15425,27 @@ var InputBase = function (_React$Component) {
     }
 
     /**
+     * Returns the properties for a given element.
+     *
+     * @return {object}
+     */
+
+  }, {
+    key: 'attrs',
+    value: function attrs(props) {
+      var attrs = (0, _lodash.assign)({}, this.props, {
+        onChange: this.onChange.bind(this)
+      }, props || {});
+
+      if ('value' in attrs) {
+        attrs.defaultValue = attrs.value;
+        delete attrs.value;
+      }
+
+      return attrs;
+    }
+
+    /**
      * This is only called when the component is mounting. It adds some logic to
      * determine which value to use as a default based on a props.
      *
@@ -15774,10 +15795,8 @@ var InputField = function (_InputBase) {
   }, {
     key: 'render',
     value: function render() {
+      var attrs = this.attrs();
       var errMessage = _react2.default.createElement('span', null);
-      var attrs = (0, _lodash.assign)({}, this.props, {
-        onChange: this.onChange.bind(this)
-      });
 
       if (attrs.className) {
         attrs.className += ' ' + this.getClassName();
@@ -15897,10 +15916,7 @@ var SelectField = function (_InputBase) {
     key: 'render',
     value: function render() {
       var errMessage = _react2.default.createElement('span', null);
-
-      var attrs = (0, _lodash.assign)({}, this.props, {
-        onChange: this.onChange.bind(this)
-      });
+      var attrs = this.attrs();
 
       if (attrs.className) {
         attrs.className += ' ' + this.getClassName();
@@ -15991,10 +16007,7 @@ var TextareaField = function (_InputBase) {
     key: 'render',
     value: function render() {
       var errMessage = _react2.default.createElement('span', null);
-
-      var attrs = (0, _lodash.assign)({}, this.props, {
-        onChange: this.onChange.bind(this)
-      });
+      var attrs = this.attrs();
 
       if (attrs.className) {
         attrs.className += ' ' + this.getClassName();
@@ -16324,13 +16337,16 @@ var registerInput = exports.registerInput = function registerInput(formName, inp
 };
 
 var destroyForm = exports.destroyForm = function destroyForm(formName) {
-  state[formName] = null;
-  delete state[formName];
+  if (state[formName]) {
+    state[formName] = null;
+    delete state[formName];
+  }
 };
 
 var destroyInput = exports.destroyInput = function destroyInput(formName, inputName) {
   if (state[formName][inputName]) {
     state[formName][inputName].validate = null;
+    state[formName][inputName].value = null;
     delete state[formName][inputName];
   }
 };

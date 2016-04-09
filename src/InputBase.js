@@ -103,6 +103,24 @@ export default class InputBase extends React.Component {
   }
 
   /**
+   * Returns the properties for a given element.
+   *
+   * @return {object}
+   */
+  attrs(props) {
+    const attrs = assign({}, this.props, {
+      onChange: this.onChange.bind(this)
+    }, props || {});
+
+    if ('value' in attrs) {
+      attrs.defaultValue = attrs.value;
+      delete attrs.value;
+    }
+
+    return attrs;
+  }
+
+  /**
    * This is only called when the component is mounting. It adds some logic to
    * determine which value to use as a default based on a props.
    *

@@ -15,10 +15,7 @@ export default class TextareaField extends InputBase {
   }
   render() {
     let errMessage = <span />;
-
-    const attrs = assign({}, this.props, {
-      onChange: this.onChange.bind(this)
-    });
+    const attrs = this.attrs();
 
     if (attrs.className) {
       attrs.className += ` ${this.getClassName()}`;

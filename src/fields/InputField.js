@@ -72,10 +72,8 @@ export default class InputField extends InputBase {
    * @return {object} ReactElement
    */
   render() {
+    const attrs = this.attrs();
     let errMessage = <span />;
-    const attrs = assign({}, this.props, {
-      onChange: this.onChange.bind(this)
-    });
 
     if (attrs.className) {
       attrs.className += ` ${this.getClassName()}`;

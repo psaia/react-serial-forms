@@ -39,6 +39,19 @@ const isInvalid = function(classname) {
 };
 
 describe('BasicForm', function() {
+  it('should handle pre-filled in values', function() {
+    const form = setupComponent((
+      <BasicForm>
+        <InputField
+          name='last_name'
+          value='abc'
+        />
+      </BasicForm>
+    ));
+    const DOMNode = ReactDOM.findDOMNode(form);
+    simulate.change(DOMNode.querySelector('input'), { target: { value: 'efg' }});
+    expect(form.serialize().last_name).to.equal('efg');
+  });
   it('should properly serialize form', function() {
     let form = setupComponent(simple());
     let DOMNode = ReactDOM.findDOMNode(form);
