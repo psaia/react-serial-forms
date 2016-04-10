@@ -52,6 +52,7 @@ describe('BasicForm', function() {
     simulate.change(DOMNode.querySelector('input'), { target: { value: 'efg' }});
     expect(form.serialize().last_name).to.equal('efg');
   });
+
   it('should properly serialize form', function() {
     let form = setupComponent(simple());
     let DOMNode = ReactDOM.findDOMNode(form);

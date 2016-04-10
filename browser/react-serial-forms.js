@@ -15407,21 +15407,18 @@ var InputBase = function (_React$Component) {
     }
 
     /**
-     * Only update when there is a value change.
+     * Check if the value attribute was explicitly updated. If it was, update the
+     * state's value.
      *
-     * @return {boolean}
+     * @return {void}
      */
 
   }, {
-    key: 'shouldComponentUpdate',
-    value: function shouldComponentUpdate(nextProps, nextState) {
-      var val = (0, _state.inputValue)(this.context.formName, this.props.name);
-      var nextVal = nextProps.value ? nextProps.value : null;
-
-      if (this.state.error !== nextState.error || nextVal !== val) {
-        return true;
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (nextProps.value !== undefined && nextProps.value !== this.props.value) {
+        (0, _state.inputValue)(this.context.formName, this.props.name, nextProps.value);
       }
-      return false;
     }
 
     /**
@@ -15434,13 +15431,9 @@ var InputBase = function (_React$Component) {
     key: 'attrs',
     value: function attrs(props) {
       var attrs = (0, _lodash.assign)({}, this.props, {
-        onChange: this.onChange.bind(this)
+        onChange: this.onChange.bind(this),
+        value: (0, _state.inputValue)(this.context.formName, this.props.name)
       }, props || {});
-
-      if ('value' in attrs) {
-        attrs.defaultValue = attrs.value;
-        delete attrs.value;
-      }
 
       return attrs;
     }

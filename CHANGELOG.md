@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.3
+  * Implemented `componentWillReceiveProps()` to update the state's value if it's dirty.
+
 ## v2.0.2
   * Added handy `attrs()` method which takes care of hard-setting a `value` prop on an input. ([fixes #22](https://github.com/LevInteractive/react-serial-forms/issues/22))
 

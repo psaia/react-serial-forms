@@ -90,6 +90,20 @@ input[type="email"] {
 
     var DemoForm = React.createClass({
       getInitialState: function() {
+
+        (function(self) {
+          self.lateLoaderProps = {
+            name: 'fav',
+            type: 'text'
+          };
+
+          // Simulate a ajax request.
+          setTimeout(function() {
+            self.lateLoaderProps.value = 'Ramen';
+            self.forceUpdate();
+          }, 2000);
+        })(this);
+
         return {
           serialization: '',
           addedPeople: Immutable.List(),
@@ -178,6 +192,8 @@ input[type="email"] {
           { text: 'Beans', value: 'bean' },
           { text: 'Avocado', value: 'avocado' }
         ];
+
+        // For the sake of this demo, update the json all the time.
         var attrs = {
           onChange: function() {
             self.forceUpdate();
@@ -235,10 +251,17 @@ input[type="email"] {
                   name='age'/>
               </p>
               <p>
+                <label htmlFor='fav'>Favorite Food (fake ajax request)</label>
+                <InputField
+                  {...attrs}
+                  {...this.lateLoaderProps}
+                />
+              </p>
+              <p>
                 <label htmlFor='occupation'>Occupation (pre-filled in value)</label>
                 <InputField
                   {...attrs}
-                  placeholder='22'
+                  placeholder='Coder'
                   type='text'
                   value='Developer'
                   name='occupation'

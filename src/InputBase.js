@@ -88,18 +88,15 @@ export default class InputBase extends React.Component {
   }
 
   /**
-   * Only update when there is a value change.
+   * Check if the value attribute was explicitly updated. If it was, update the
+   * state's value.
    *
-   * @return {boolean}
+   * @return {void}
    */
-  shouldComponentUpdate(nextProps, nextState) {
-    const val = inputValue(this.context.formName, this.props.name);
-    const nextVal = nextProps.value ? nextProps.value : null;
-
-    if (this.state.error !== nextState.error || nextVal !== val) {
-      return true;
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.value !== undefined && nextProps.value !== this.props.value) {
+      inputValue(this.context.formName, this.props.name, nextProps.value)
     }
-    return false;
   }
 
   /**
@@ -109,13 +106,9 @@ export default class InputBase extends React.Component {
    */
   attrs(props) {
     const attrs = assign({}, this.props, {
-      onChange: this.onChange.bind(this)
+      onChange: this.onChange.bind(this),
+      value: inputValue(this.context.formName, this.props.name)
     }, props || {});
-
-    if ('value' in attrs) {
-      attrs.defaultValue = attrs.value;
-      delete attrs.value;
-    }
 
     return attrs;
   }
