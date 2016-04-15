@@ -3,11 +3,19 @@ import InputBase from '../InputBase';
 import { assign } from 'lodash';
 
 export default class SelectField extends InputBase {
-  /**
-   * @constructs SelectField
-   */
   constructor(props) {
     super(props);
+  }
+  getInitialValue() {
+    if (this.props.defaultValue !== undefined) {
+      return this.props.defaultValue;
+    }
+
+    if (this.props.value !== undefined) {
+      return this.props.value;
+    }
+
+    return this.props.multiple ? [] : '';
   }
 
   originalOnChange(event) {
@@ -29,9 +37,9 @@ export default class SelectField extends InputBase {
       return;
     }
 
-    let options = event.target.options;
-    let val = [];
-    let len = options.length;
+    const options = event.target.options;
+    const val = [];
+    const len = options.length;
 
     for (let i = 0; i < len; i++) {
       if (options[i].selected) {

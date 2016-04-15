@@ -1,6 +1,6 @@
 {
   "name": "react-serial-forms",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A small high performant form library built specifically for React.",
   "main": "./lib/index.js",
   "scripts": {
@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/LevInteractive/react-serial-forms",
   "peerDependencies": {
-    "react": ">=0.14.3",
-    "react-dom": ">=0.14.3"
+    "react": ">=15.0.1",
+    "react-dom": ">=15.0.1"
   },
   "devDependencies": {
     "babel": "^6.5.2",

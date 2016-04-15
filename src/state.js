@@ -75,11 +75,10 @@ export const validateForm = function(formName, onComplete = () => {}) {
 export const serializeForm = function(formName) {
   const { form } = _getInputValueAndEvent(formName);
   const CACHE_KEY = '___CACHE___';
-  let valCache = {};
-  let data;
+  const valCache = {};
+  const len = size(state);
   let queryStr = '';
   let val;
-  let len = size(state);
   let i = 0;
 
   function mutateValues(obj) {
@@ -98,7 +97,7 @@ export const serializeForm = function(formName) {
     queryStr = `${queryStr}&${k}=${val}`;
   });
 
-  data = qs(queryStr);
+  const data = qs(queryStr);
   mutateValues(data);
   return data;
 };

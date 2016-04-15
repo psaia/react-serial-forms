@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.5
+  * Library is now compatible with React 15.x.x. [fixes #26](https://github.com/LevInteractive/react-serial-forms/issues/26)
+  * Now using an internal state.
+  * Various small changes based on React's suggestions.
+
 ## v2.0.4
   * Fixed issue with garbage collection during form/input removal. Thank you [@tkandr](https://github.com/tkandr). [fixes #24](https://github.com/LevInteractive/react-serial-forms/issues/24)
 

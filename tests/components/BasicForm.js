@@ -72,7 +72,7 @@ describe('BasicForm', function() {
     expect(form.serialize().age).to.equal(123.333);
 
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '' }});
-    expect(form.serialize().age).to.equal(null);
+    expect(form.serialize().age).to.equal('');
 
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 0 }});
     expect(form.serialize().age).to.equal(0);
@@ -141,7 +141,7 @@ describe('BasicForm', function() {
     let DOMNode = ReactDOM.findDOMNode(form);
     let serializedObj = form.serialize();
 
-    expect(serializedObj.title).to.equal(null);
+    expect(serializedObj.title).to.equal('');
     expect(serializedObj.veges).to.eql([
       'garlic',
       'carrot',

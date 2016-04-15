@@ -15344,7 +15344,8 @@ var InputBase = function (_React$Component) {
     _this._onChange = null;
     _this._hasMounted = false;
     _this.state = {
-      error: null
+      error: null,
+      value: props.initialValue
     };
     return _this;
   }
@@ -15362,6 +15363,10 @@ var InputBase = function (_React$Component) {
       var _this2 = this;
 
       (0, _state.registerInput)(this.context.formName, this.props.name, this.getInitialValue(), this.validate.bind(this));
+
+      this.setState({
+        value: this.getInitialValue()
+      });
 
       var availableValidators = _validation2.default.collection();
 
@@ -15417,8 +15422,24 @@ var InputBase = function (_React$Component) {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
       if (nextProps.value !== undefined && nextProps.value !== this.props.value) {
-        (0, _state.inputValue)(this.context.formName, this.props.name, nextProps.value);
+        this.setValueState(nextProps.value);
       }
+    }
+
+    /**
+     * This will set both the global and internal state for the component.
+     *
+     * @param {mixed}
+     * @return {void}
+     */
+
+  }, {
+    key: 'setValueState',
+    value: function setValueState(val) {
+      (0, _state.inputValue)(this.context.formName, this.props.name, val);
+      this.setState({
+        value: val
+      });
     }
 
     /**
@@ -15432,7 +15453,7 @@ var InputBase = function (_React$Component) {
     value: function attrs(props) {
       var attrs = (0, _lodash.assign)({}, this.props, {
         onChange: this.onChange.bind(this),
-        value: (0, _state.inputValue)(this.context.formName, this.props.name)
+        value: this.state.value
       }, props || {});
 
       return attrs;
@@ -15456,7 +15477,7 @@ var InputBase = function (_React$Component) {
         return this.props.value;
       }
 
-      return null;
+      return '';
     }
 
     /**
@@ -15475,6 +15496,7 @@ var InputBase = function (_React$Component) {
       } else if (this.state.error) {
         return 'serial-form-input invalid';
       }
+
       return '';
     }
 
@@ -15489,7 +15511,7 @@ var InputBase = function (_React$Component) {
   }, {
     key: 'updateValue',
     value: function updateValue(value) {
-      (0, _state.inputValue)(this.context.formName, this.props.name, value);
+      this.setValueState(value);
       this.validate();
     }
 
@@ -15514,7 +15536,6 @@ var InputBase = function (_React$Component) {
       var errors = [];
       var i = 0;
       var createError = function createError(validator) {
-        var err = void 0;
         var msg = void 0;
         if (!validator === undefined || validator === null) {
           msg = 'Invalid.';
@@ -15530,8 +15551,7 @@ var InputBase = function (_React$Component) {
             msg = validatorMsg;
           }
         }
-        err = new _ValidationError2.default(msg);
-        return err;
+        return new _ValidationError2.default(msg);
       };
       var _validate = function _validate() {
         var _v = _this3.validators[i++];
@@ -15607,7 +15627,9 @@ var InputBase = function (_React$Component) {
 
 
 exports.default = InputBase;
-InputBase.defaultProps = {};
+InputBase.defaultProps = {
+  initialValue: ''
+};
 
 /**
  * Validation for properties.
@@ -15731,7 +15753,7 @@ var InputField = function (_InputBase) {
         if (this.props.checked) {
           return this.props.value;
         } else {
-          return null;
+          return '';
         }
       }
       return _get(Object.getPrototypeOf(InputField.prototype), 'getInitialValue', this).call(this);
@@ -15747,7 +15769,7 @@ var InputField = function (_InputBase) {
   }, {
     key: 'onChange',
     value: function onChange(event) {
-      var val = null;
+      var val = '';
       var elType = event.nativeEvent.target.type;
 
       switch (elType) {
@@ -15757,7 +15779,7 @@ var InputField = function (_InputBase) {
         case 'number':
           val = parseFloat(event.target.value);
           if (isNaN(val)) {
-            val = null;
+            val = '';
           }
           break;
         case 'radio':
@@ -15851,10 +15873,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var SelectField = function (_InputBase) {
   _inherits(SelectField, _InputBase);
 
-  /**
-   * @constructs SelectField
-   */
-
   function SelectField(props) {
     _classCallCheck(this, SelectField);
 
@@ -15862,6 +15880,19 @@ var SelectField = function (_InputBase) {
   }
 
   _createClass(SelectField, [{
+    key: 'getInitialValue',
+    value: function getInitialValue() {
+      if (this.props.defaultValue !== undefined) {
+        return this.props.defaultValue;
+      }
+
+      if (this.props.value !== undefined) {
+        return this.props.value;
+      }
+
+      return this.props.multiple ? [] : '';
+    }
+  }, {
     key: 'originalOnChange',
     value: function originalOnChange(event) {
       if (typeof this.props.onChange === 'function') {
@@ -16331,13 +16362,16 @@ var registerInput = exports.registerInput = function registerInput(formName, inp
 
 var destroyForm = exports.destroyForm = function destroyForm(formName) {
   if (state[formName]) {
+    (0, _lodash.forEach)(state[formName], function (input, inputName) {
+      return destroyInput(formName, inputName);
+    });
     state[formName] = null;
     delete state[formName];
   }
 };
 
 var destroyInput = exports.destroyInput = function destroyInput(formName, inputName) {
-  if (state[formName][inputName]) {
+  if (state[formName] && state[formName][inputName]) {
     state[formName][inputName].validate = null;
     state[formName][inputName].value = null;
     delete state[formName][inputName];
@@ -16387,10 +16421,9 @@ var serializeForm = exports.serializeForm = function serializeForm(formName) {
 
   var CACHE_KEY = '___CACHE___';
   var valCache = {};
-  var data = void 0;
+  var len = (0, _lodash.size)(state);
   var queryStr = '';
   var val = void 0;
-  var len = (0, _lodash.size)(state);
   var i = 0;
 
   function mutateValues(obj) {
@@ -16409,7 +16442,7 @@ var serializeForm = exports.serializeForm = function serializeForm(formName) {
     queryStr = queryStr + '&' + k + '=' + val;
   });
 
-  data = (0, _qs2.default)(queryStr);
+  var data = (0, _qs2.default)(queryStr);
   mutateValues(data);
   return data;
 };

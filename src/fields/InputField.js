@@ -21,7 +21,7 @@ export default class InputField extends InputBase {
       if (this.props.checked) {
         return this.props.value;
       } else {
-        return null;
+        return '';
       }
     }
     return super.getInitialValue();
@@ -34,7 +34,7 @@ export default class InputField extends InputBase {
    * @return {void}
    */
   onChange(event) {
-    let val = null;
+    let val = '';
     const elType = event.nativeEvent.target.type;
 
     switch (elType) {
@@ -44,7 +44,7 @@ export default class InputField extends InputBase {
       case 'number':
         val = parseFloat(event.target.value);
         if (isNaN(val)) {
-          val = null;
+          val = '';
         }
         break;
       case 'radio':

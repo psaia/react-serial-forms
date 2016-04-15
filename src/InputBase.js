@@ -35,7 +35,8 @@ export default class InputBase extends React.Component {
     this._onChange = null;
     this._hasMounted = false;
     this.state = {
-      error: null
+      error: null,
+      value: props.initialValue
     };
   }
 
@@ -52,10 +53,14 @@ export default class InputBase extends React.Component {
       this.validate.bind(this)
     );
 
+    this.setState({
+      value: this.getInitialValue()
+    });
+
     const availableValidators = validation.collection();
 
     if (this.props.validation) {
-      let types = this.props.validation.split(',');
+      const types = this.props.validation.split(',');
       let i = 0;
       for (let len = types.length; i < len; i++) {
         forEach(availableValidators, (validator) => {
@@ -95,8 +100,21 @@ export default class InputBase extends React.Component {
    */
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== undefined && nextProps.value !== this.props.value) {
-      inputValue(this.context.formName, this.props.name, nextProps.value)
+      this.setValueState(nextProps.value);
     }
+  }
+
+  /**
+   * This will set both the global and internal state for the component.
+   *
+   * @param {mixed}
+   * @return {void}
+   */
+  setValueState(val) {
+    inputValue(this.context.formName, this.props.name, val)
+    this.setState({
+      value: val
+    });
   }
 
   /**
@@ -107,7 +125,7 @@ export default class InputBase extends React.Component {
   attrs(props) {
     const attrs = assign({}, this.props, {
       onChange: this.onChange.bind(this),
-      value: inputValue(this.context.formName, this.props.name)
+      value: this.state.value
     }, props || {});
 
     return attrs;
@@ -128,7 +146,7 @@ export default class InputBase extends React.Component {
       return this.props.value;
     }
 
-    return null;
+    return '';
   }
 
   /**
@@ -144,6 +162,7 @@ export default class InputBase extends React.Component {
     } else if (this.state.error) {
       return 'serial-form-input invalid';
     }
+
     return '';
   }
 
@@ -155,7 +174,7 @@ export default class InputBase extends React.Component {
    * @return {void}
    */
   updateValue(value) {
-    inputValue(this.context.formName, this.props.name, value);
+    this.setValueState(value);
     this.validate();
   }
 
@@ -173,7 +192,6 @@ export default class InputBase extends React.Component {
     const errors = [];
     let i = 0;
     const createError = (validator) => {
-      let err;
       let msg;
       if (!validator === undefined || validator === null) {
         msg = 'Invalid.';
@@ -189,8 +207,7 @@ export default class InputBase extends React.Component {
           msg = validatorMsg;
         }
       }
-      err = new ValidationError(msg);
-      return err;
+      return new ValidationError(msg);
     };
     const _validate = () => {
       const _v = this.validators[i++];
@@ -250,7 +267,9 @@ export default class InputBase extends React.Component {
  * @static
  * @type {object}
  */
-InputBase.defaultProps = {};
+InputBase.defaultProps = {
+  initialValue: ''
+};
 
 /**
  * Validation for properties.
