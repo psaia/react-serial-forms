@@ -32,13 +32,14 @@ export const registerInput = function(formName, inputName, initialValue, validat
 
 export const destroyForm = function(formName) {
   if (state[formName]) {
+    forEach(state[formName], (input, inputName) => destroyInput(formName, inputName));
     state[formName] = null;
     delete state[formName];
   }
 };
 
 export const destroyInput = function(formName, inputName) {
-  if (state[formName][inputName]) {
+  if (state[formName] && state[formName][inputName]) {
     state[formName][inputName].validate = null;
     state[formName][inputName].value = null;
     delete state[formName][inputName];
