@@ -24,9 +24,9 @@ Serial Forms aims to accomplish the following goals:
 * Source code must be as good as any documentation.
 
 
-# Example
+# Demo
 
-**[Example 1](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**
+**[Kitchen Sink](http://levinteractive.github.io/react-serial-forms/examples/demo.html)**
 
 This example demonstrates a very basic form with validation, a repeater field,
 and an undo button.

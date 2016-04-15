@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.4
+  * Fixed issue with garbage collection during form/input removal. Thank you [@tkandr](https://github.com/tkandr). [fixes #24](https://github.com/LevInteractive/react-serial-forms/issues/24)
+
 ## v2.0.3
   * Implemented `componentWillReceiveProps()` to update the state's value if it's dirty.
 

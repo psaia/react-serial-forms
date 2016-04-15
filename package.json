@@ -1,6 +1,6 @@
 {
   "name": "react-serial-forms",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A small high performant form library built specifically for React.",
   "main": "./lib/index.js",
   "scripts": {
