@@ -133,12 +133,14 @@ let messages = {
 Validators are 100% asynchronous as of v2.0!
 
 ```javascript
+
+// Some file for custom validators used throughout application...
 import { validation } from 'react-serial-forms';
 
 validation.registerValidator({
   name: 'unique_username',
   determine: function(value, pass, fail) {
-    someAsyncRequest((res) = {
+    someAsyncRequest(value, (res) = {
       if (res.ok) {
         pass();
       } else {
@@ -149,6 +151,7 @@ validation.registerValidator({
   message: 'Username is taken.'
 });
 
+// Implementation.
 <InputField type='text' validation='unique_username' name='username' />
 ```
 
