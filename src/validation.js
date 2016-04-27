@@ -15,6 +15,9 @@ const _isSupplied = function(val) {
   if (val && val.size && val.toJS) {
     value = val.toJS();
   }
+  if (_.isDate(value)) {
+    return true;
+  }
   if (_.isArray(value) && _.isEmpty(value)) {
     return false;
   }
