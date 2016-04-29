@@ -16498,6 +16498,9 @@ var _isSupplied = function _isSupplied(val) {
   if (val && val.size && val.toJS) {
     value = val.toJS();
   }
+  if (_lodash2.default.isDate(value)) {
+    return true;
+  }
   if (_lodash2.default.isArray(value) && _lodash2.default.isEmpty(value)) {
     return false;
   }
