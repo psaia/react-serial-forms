@@ -4,7 +4,7 @@
 
 We will no longer be maintaining this module in favor of something more
 one-directional like [redux-form](https://github.com/erikras/redux-form). If you
-have any input or ideas road map, please reply
+have any input or ideas, please reply
 [here](https://github.com/LevInteractive/react-serial-forms/issues/32). Sorry, and
 thank you!
 
