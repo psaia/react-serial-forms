@@ -1,6 +1,6 @@
 # Serial Forms
 
-## **Deprecation Warning**: No long maintaining
+## **Deprecation Warning**: No longer maintaining
 
 We will no longer be maintaining this module in favor of something more
 one-directional like [redux-form](https://github.com/erikras/redux-form). If you
