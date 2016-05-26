@@ -1,5 +1,16 @@
 # Serial Forms
 
+## **Deprecation Warning**: No long maintaining
+
+We will no longer be maintaining this module in favor of something more
+one-directional like [redux-form](https://github.com/erikras/redux-form). If you
+have any input or ideas road map, please reply
+[here](https://github.com/LevInteractive/react-serial-forms/issues/32). Sorry, and
+thank you!
+
+-------------------------------------------
+
+
 This library is a light abstraction over
 [React forms](https://facebook.github.io/react/docs/forms.html) (85k minified) that allows for
 customizable layouts for various types of data schemas. Serial Forms decouples
