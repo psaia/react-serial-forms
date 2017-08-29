@@ -1,21 +1,21 @@
-/*eslint-disable */
 var gulp = require('gulp');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
-var gutil = require('gulp-util');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var plumber = require('gulp-plumber');
-var react = require('gulp-react');
-var rename = require('gulp-rename');
 var browserify = require('browserify');
 var babel = require('gulp-babel');
 var del = require('del');
 
+process.env.NODE_ENV === 'production';
+
 gulp.task('transpile-lib', ['clean-lib'], function() {
-  gulp.src('./src/**/*.js')
+  gulp.src(['./src/**/*.js', '!./src/commonjs.js'])
     .pipe(plumber())
-    .pipe(babel())
+    .pipe(babel({
+      presets: ["react", "es2015"]
+    }))
     .pipe(gulp.dest('lib'));
 });
 
@@ -24,10 +24,18 @@ gulp.task('bundle', ['clean-browser'], function() {
     return browserify({
       entries: ['./src/index.js'],
       transform: [
-        ['babelify']
+        [
+          'babelify', {
+            "presets": [
+              "react",
+              "es2015"
+            ],
+            "sourceMaps": false
+          }
+        ]
       ],
-      debug: true,
-      standalone: 'SerialForms'
+      standalone: 'SerialForms',
+      debug: true
     })
     .transform('browserify-shim')
     .bundle();

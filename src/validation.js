@@ -9,12 +9,14 @@
  * @module validation
  */
 import _ from 'lodash';
-import { Map } from 'immutable';
 
 const _isSupplied = function(val) {
   let value = val;
   if (val && val.size && val.toJS) {
     value = val.toJS();
+  }
+  if (_.isDate(value)) {
+    return true;
   }
   if (_.isArray(value) && _.isEmpty(value)) {
     return false;
@@ -33,7 +35,7 @@ const _isSupplied = function(val) {
 
 class Validation {
   constructor() {
-    this._VALIDATOR_CACHE_ = Map();
+    this._VALIDATOR_CACHE_ = {};
     this._isSupplied = _isSupplied;
   }
   registerValidator(validationObject) {
@@ -43,17 +45,16 @@ class Validation {
     if (!validationObject.name) {
       throw new Error('A \'name\' string is required.');
     }
-    if (!validationObject.invalid) {
-      throw new Error('A \'name\' method is required.');
+    if (!validationObject.determine) {
+      throw new Error('A \'determine\' method is required.');
     }
     if (!validationObject.message) {
       throw new Error('A \'message\' string is required.');
     }
 
-    this._VALIDATOR_CACHE_ = this._VALIDATOR_CACHE_.set(
-      validationObject.name,
-      validationObject
-    );
+    this._VALIDATOR_CACHE_[
+      validationObject.name
+    ] = validationObject;
   }
   collection() {
     return this._VALIDATOR_CACHE_;
@@ -69,27 +70,36 @@ const validation = new Validation();
 
 validation.registerValidator({
   name: 'required',
-  invalid: function(value) {
-    return !_isSupplied(value);
+  determine: function(value, pass, fail) {
+    if (_isSupplied(value)) {
+      return pass();
+    }
+    fail();
   },
   message: 'This field is required.'
 });
 
 validation.registerValidator({
   name: 'email',
-  invalid: function(value) {
+  determine: function(value, pass, fail) {
     const EMAIL_PATTERN = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return _isSupplied(value) && !EMAIL_PATTERN.test(value);
+    if (_isSupplied(value) && !EMAIL_PATTERN.test(value)) {
+      return fail();
+    }
+    pass();
   },
   message: 'Email is invalid.'
 });
 
 validation.registerValidator({
   name: 'numeral',
-  invalid: function(value) {
-    return _isSupplied(value) && !/^[0-9.]+$/.test(value);
+  determine: function(value, pass, fail) {
+    if (_isSupplied(value) && !/^[0-9.]+$/.test(value)) {
+      return fail();
+    }
+    pass();
   },
   message: 'Must be a number.'
 });
 
-module.exports = validation;
+export default validation;

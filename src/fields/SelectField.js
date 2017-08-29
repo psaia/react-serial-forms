@@ -1,27 +1,27 @@
 import React from 'react';
 import InputBase from '../InputBase';
+import { assign } from 'lodash';
 
 export default class SelectField extends InputBase {
-  /**
-   * @constructs SelectField
-   */
   constructor(props) {
     super(props);
   }
+  getInitialValue() {
+    if (this.props.defaultValue !== undefined) {
+      return this.props.defaultValue;
+    }
 
-  /**
-   * The only special attribute select boxes will need is `options`.
-   *
-   * @return {void}
-   */
-  componentWillMount() {
-    super.componentWillMount();
-    this.updateAttrs(
-      {
-        options: []
-      },
-      this.props
-    );
+    if (this.props.value !== undefined) {
+      return this.props.value;
+    }
+
+    return this.props.multiple ? [] : '';
+  }
+
+  originalOnChange(event) {
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(event);
+    }
   }
 
   /**
@@ -32,19 +32,23 @@ export default class SelectField extends InputBase {
    */
   onChange(event) {
     if (!event.target.multiple) {
-      return super.onChange(event);
+      this.updateValue(event.target.value);
+      this.originalOnChange(event);
+      return;
     }
-    let options = event.target.options;
-    let val = [];
-    let len = options.length;
+
+    const options = event.target.options;
+    const val = [];
+    const len = options.length;
+
     for (let i = 0; i < len; i++) {
       if (options[i].selected) {
         val.push(options[i].value);
       }
     }
-    this.updateAttrs({
-      value: val
-    }, this.ogOnChange.bind(this, event));
+
+    this.updateValue(val);
+    this.originalOnChange(event);
   }
 
   /**
@@ -53,15 +57,16 @@ export default class SelectField extends InputBase {
    * @return {object} ReactElement
    */
   render() {
-    let attrs = this.attrs();
     let errMessage = <span />;
+    const attrs = this.attrs();
 
-    if (this.state.error === null) {
-      attrs.className += ' idle';
-    } else if (this.state.error === false) {
-      attrs.className += ' success';
-    } else if (this.hasError()) {
-      attrs.className += ' error';
+    if (attrs.className) {
+      attrs.className += ` ${this.getClassName()}`;
+    } else {
+      attrs.className = this.getClassName();
+    }
+
+    if (this.state.error) {
       errMessage = (
         <span className='err-msg'>
           {this.state.error.message}

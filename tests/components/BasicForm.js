@@ -1,46 +1,65 @@
-/*eslint-env mocha */
-/*eslint no-unused-expressions: 0, no-unused-vars: 0 */
+require('../setup')('<html><body></body></html>');
+
 import chai from 'chai';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TestUtils from 'react-addons-test-utils';
+import simple from './test-forms/simple';
+import complex from './test-forms/complex';
 
-let ReactDOM;
-let simulate;
-let expect;
-let TestUtils;
+import {
+  validation,
+  InputField,
+  BasicForm,
+  ValidationError
+} from '../../src/index';
 
-// Render react element into the DOM.
+const simulate = TestUtils.Simulate;
+const expect = chai.expect;
+
+const getComponent = function(path) {
+  return require(path).default;
+}
+
 const setupComponent = function(jsx) {
   let renderedComponent = TestUtils.renderIntoDocument(jsx);
   return renderedComponent;
 };
 
-const isIdle = function(classname) {
-  return classname === 'serial-form-input idle';
+const isFresh = function(classname) {
+  return classname === 'serial-form-input fresh';
 };
 
-const isSuccess = function(classname) {
-  return classname === 'serial-form-input success';
+const isValid = function(classname) {
+  return classname === 'serial-form-input valid';
 };
 
-const isError = function(classname) {
-  return classname === 'serial-form-input error';
+const isInvalid = function(classname) {
+  return classname === 'serial-form-input invalid';
 };
-
-// Load up react since the DOM is ready.
-before(function() {
-  ReactDOM = require('react-dom');
-  TestUtils = require('react-addons-test-utils');
-  simulate = TestUtils.Simulate;
-  expect = chai.expect;
-});
 
 describe('BasicForm', function() {
-  it('should cause all inputs to validate on validate()', function(done) {
-    let form = setupComponent(require('./test-forms/simple.js'));
+  it('should handle pre-filled in values', function() {
+    const form = setupComponent((
+      <BasicForm>
+        <InputField
+          name='last_name'
+          value='abc'
+        />
+      </BasicForm>
+    ));
+    const DOMNode = ReactDOM.findDOMNode(form);
+    simulate.change(DOMNode.querySelector('input'), { target: { value: 'efg' }});
+    expect(form.serialize().last_name).to.equal('efg');
+  });
+
+  it('should properly serialize form', function() {
+    let form = setupComponent(simple());
     let DOMNode = ReactDOM.findDOMNode(form);
     let firstName = () => DOMNode.querySelector('input[name="first_name"]');
     let company = () => DOMNode.querySelector('input[name="company"]');
 
-    expect(isIdle(firstName().getAttribute('class'))).to.be.true;
+    expect(isFresh(firstName().getAttribute('class'))).to.be.true;
 
     // Test number inputs.
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '111' }});
@@ -53,29 +72,76 @@ describe('BasicForm', function() {
     expect(form.serialize().age).to.equal(123.333);
 
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: '' }});
-    expect(form.serialize().age).to.equal(null);
+    expect(form.serialize().age).to.equal('');
 
     simulate.change(DOMNode.querySelector('input[name="age"]'), { target: { value: 0 }});
     expect(form.serialize().age).to.equal(0);
+  });
 
-    // Do a validation and make sure the fields validated correctly.
-    form.validate(function(valid) {
-      expect(valid).to.be.false;
+  it('should handle a async validate', function(done) {
+    validation.registerValidator({
+      name: 'slowfail',
+      determine: function(value, resolve, reject) {
+        setTimeout(() => {
+          reject();
+        }, 100);
+      },
+      message: 'slow error'
+    });
 
-      expect(isError(firstName().getAttribute('class'))).to.be.true;
-      expect(isError(company().getAttribute('class'))).to.be.false;
+    validation.registerValidator({
+      name: 'slowfail-custom-msg',
+      determine: function(value, resolve, reject) {
+        setTimeout(() => {
+          reject();
+        }, 110);
+      },
+      message: 'slower error'
+    });
 
-      done();
+    const form = setupComponent((
+      <BasicForm>
+        <InputField name='first_name' validation='slowfail' />
+      </BasicForm>
+    ));
+
+    const messages = {
+      'slowfail-custom-msg': 'foobar'
+    };
+
+    const form2 = setupComponent((
+      <BasicForm>
+        <InputField
+          name='last_name'
+          messages={messages}
+          validation='slowfail-custom-msg'
+        />
+      </BasicForm>
+    ));
+
+    form.validate((errs) => {
+      expect(errs.length).to.equal(1);
+      expect(errs[0].message).to.equal('slow error');
+    })
+
+    form2.validate((errs) => {
+      setTimeout(() => {
+        expect(errs.length).to.equal(1);
+        expect(errs[0].message).to.equal('foobar');
+        let DOMNode = ReactDOM.findDOMNode(form2);
+        let el = DOMNode.querySelector('input[name="last_name"]')
+        expect(isInvalid(el.getAttribute('class'))).to.be.true;
+        done();
+      }, 10);
     });
   });
 
   it('should correctly serialize the form data', function() {
-    let form = setupComponent(require('./test-forms/complex.js'));
+    let form = setupComponent(complex());
     let DOMNode = ReactDOM.findDOMNode(form);
-    let input = DOMNode.querySelector('input[name="company"]');
     let serializedObj = form.serialize();
 
-    expect(serializedObj.title).to.equal(null);
+    expect(serializedObj.title).to.equal('');
     expect(serializedObj.veges).to.eql([
       'garlic',
       'carrot',
