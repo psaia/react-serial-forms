@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/LevInteractive/react-serial-forms.git"
+    "url": "https://github.com/motormuis/react-serial-forms.git"
   },
   "keywords": [
     "react",
@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/LevInteractive/react-serial-forms",
   "peerDependencies": {
-    "react": ">=0.14.0",
-    "react-dom": ">=0.14.0"
+    "react": ">=15.6.0",
+    "react-dom": ">=15.6.0"
   },
   "devDependencies": {
     "babel": "^6.5.2",
@@ -49,7 +49,7 @@
     "jsdom": "^8.2.0",
     "lodash": "^4.6.1",
     "mocha": "^2.4.5",
-    "react-addons-test-utils": "^0.14.7",
+    "react-addons-test-utils": "^15.6.0",
     "testdom": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
