@@ -1,1 +1,1 @@
-export const foobar = 1;
+// I exist.
