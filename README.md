@@ -110,3 +110,73 @@ function MyComponent() {
   );
 }
 ```
+
+
+### Using a custom component
+
+```typescript
+import React from "react";
+import Textarea from "../custom-inputs/Textarea"; // Assume you have your own.
+import { BaseInputProps } from "react-serial-forms/lib/types";
+import Form from "react-serial-forms/lib/form";
+import Errors from "react-serial-forms/lib/components/FormErrors";
+import useInput from "react-serial-forms/lib/hooks/use-input";
+
+export interface Props extends BaseInputProps<Form> {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  ol: boolean;
+  ul: boolean;
+}
+
+export default function Wysiwyg(props: Props) {
+  const [id, dirty, currentValue, errors, onChange] = useInput({
+    name: props.name,
+    getValueFromEvent: val => val,
+    defaultValue: "",
+    form: props.form,
+    validations: props.validations
+  });
+
+  return (
+    <div className="input-wrapper">
+      {props.label ? <label htmlFor={id}>{props.label}</label> : null}
+      <Textarea
+        onChange={onChange}
+        value={currentValue}
+        bold={props.bold}
+        italic={props.italic}
+        underline={props.underline}
+        ol={props.ol}
+        ul={props.ul}
+      />
+      {props.helper ? (
+        <small
+          className="helper-text"
+          dangerouslySetInnerHTML={{ __html: props.helper }}
+        />
+      ) : null}
+      <Errors errors={dirty ? errors : []} />
+    </div>
+  );
+}
+```
+
+Now you can use this component simply by importing it:
+
+```typescript
+...
+  <Wysiwyg
+    type="text"
+    name="description"
+    bold={true}
+    italic={false}
+    ol={true}
+    underline={false}
+    ul={false}
+    form={form}
+    validations={[validations.required("A description is required.")]}
+  />
+...
+```
