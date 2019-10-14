@@ -18,9 +18,12 @@
     "url": "https://github.com/psaia/react-serial-forms/issues"
   },
   "homepage": "https://github.com/psaia/react-serial-forms#readme",
+  "peerDependencies": {
+    "lodash": "4.x",
+    "react": "16.x"
+  },
   "dependencies": {
-    "lodash": "^4.17.15",
-    "react": "^16.10.2"
+    "fast-observer": "^1.0.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.144",

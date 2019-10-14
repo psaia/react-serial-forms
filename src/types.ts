@@ -49,15 +49,6 @@ export type InputValidations = {
   [inputName: string]: Validation[];
 };
 
-// An observer payload function.
-export type PayloadFn = (payload?: any) => void | Promise<void>;
-
-// An observer subscription.
-export interface Subscription {
-  name: string;
-  fn: PayloadFn;
-}
-
 // Props used buy useInput.
 export type InputHookProps<T> = {
   getValueFromEvent: (event: any) => any;

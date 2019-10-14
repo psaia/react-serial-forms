@@ -1,4 +1,4 @@
-import Observer from "./observer";
+import Observer from "fast-observer";
 import isEqual from "lodash/isEqual";
 import cloneDeep from "lodash/cloneDeep";
 import { checkValidations } from "./validation";
