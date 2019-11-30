@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { checkValidations } from "../validation";
-import Form from "../Form";
+import Form from "../form";
 import { InputMode, InputHookProps } from "../types";
 
 /**

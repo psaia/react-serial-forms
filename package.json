@@ -1,6 +1,6 @@
 {
   "name": "react-serial-forms",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "A lean, highly performant, and extendable form library for React.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

@@ -3,7 +3,7 @@ import { BaseInputProps } from "../../types";
 import Errors from "../FormErrors";
 import isFunction from "lodash/isFunction";
 import useInput from "../../hooks/use-input";
-import Form from "../../Form";
+import Form from "../../form";
 
 export interface Props extends BaseInputProps<Form> {
   type: string;
