@@ -7,7 +7,7 @@ function formatPhoneNumber(phoneNumberString: string) {
     return [intlCode, "(", match[2], ") ", match[3], "-", match[4]].join("");
   }
 
-  return "";
+  return phoneNumberString;
 }
 
 export default function phoneMask(s: string) {
